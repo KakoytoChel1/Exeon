@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Exeon (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Exeon (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

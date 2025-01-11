@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Exeon.Views.Pages.ChatPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Exeon.Views.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:chat_models="using:Exeon.Models.Chat"
+    xmlns:vm_tools="using:Exeon.ViewModels.Tools"
+    xmlns:converters="using:Exeon.ViewModels.Converters"
+    mc:Ignorable="d"
+    Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <!--Chat field-->
+        <Grid Grid.Row="0">
+
+            <ListBox
+                x:Name="ChatListBox"
+                Margin="0,20,0,0"
+                Background="Transparent"
+                ItemsSource="{x:Bind ViewModel.MessageItems}"
+                ItemTemplateSelector="{StaticResource MessageTemplateSelector}">
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <ContentPresenter/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </Grid>
+
+        <!--Enter message field-->
+        <Grid Grid.Row="1">
+
+            <Border
+                Margin="5"
+                CornerRadius="7"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="80"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        HorizontalAlignment="Center"
+                        Height="30"
+                        Width="30">
+
+                        <Viewbox
+                            Margin="-3,-4,-5,-4">
+                            
+                            <SymbolIcon 
+                                Symbol="Send"/>
+                        </Viewbox>
+                    </Button>
+
+                    <TextBox
+                        TextWrapping="Wrap"
+                        Grid.Column="1"
+                        BorderThickness="0"
+                        Style="{StaticResource TransparentTextBoxStyle}"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        PlaceholderText="Введіть вашу команду..."/>
+
+                    <StackPanel
+                        Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="5">
+
+                        <!--lock speak button-->
+                        <Button
+                            Height="30"
+                            Width="30">
+
+                            <Viewbox
+                                Margin="-4">
+
+                                <FontIcon
+                                    FontFamily="Segoe MDL2 Assets" 
+                                    Glyph="&#xE72E;"/>
+                            </Viewbox>
+                        </Button>
+
+                        <!--speak button-->
+                        <Button
+                            Style="{ThemeResource AccentButtonStyle}"
+                            Height="40"
+                            Width="40">
+
+                            <Viewbox
+                                Margin="-1">
+                                
+                                <SymbolIcon Symbol="Microphone"/>
+                            </Viewbox>
+                        </Button>
+                        
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

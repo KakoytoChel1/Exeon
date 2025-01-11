@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Exeon.Views.Pages.CommandsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Exeon.Views.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:Exeon.ViewModels.Converters"
+    xmlns:Interactions="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    mc:Ignorable="d"
+    x:Name="CustomCommandsPage"
+    Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+
+    <Page.Resources>
+        <DataTemplate x:Key="CustomCommandItemTemplate">
+            <Grid>
+                <Expander
+                    x:Name="CommandItemExpander"
+                    Style="{StaticResource CustomExpanderStyle}"
+                    HorizontalAlignment="Stretch"
+                    CornerRadius="5"
+                    SizeChanged="CommandItemExpander_SizeChanged">
+
+                    <Expander.Header>
+                        <Grid x:Name="HeaderGrid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!--Command panel-->
+                            <Border
+                                x:Name="CommandTitlePanel"
+                                MaxWidth="200"
+                                Grid.Column="0"
+                                CornerRadius="5"
+                                Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                Padding="10,5,10,5"
+                                BorderThickness="1.5"
+                                BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                                ToolTipService.ToolTip="{Binding Command}">
+                                
+                                <TextBlock
+                                    x:Name="innerText"
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{Binding Command}"/>
+                            </Border>
+
+                            <Line
+                                x:Name="CommandItemLine"
+                                Grid.Column="1"
+                                Margin="10,0,-10,0"
+                                X1="0"
+                                X2="1"
+                                Stroke="{ThemeResource CircleElevationBorderBrush}"
+                                StrokeThickness="2"
+                                VerticalAlignment="Center"
+                                Stretch="Fill"/>
+                        </Grid>
+                    </Expander.Header>
+
+                    <Expander.Content>
+                        <Grid
+                            MaxHeight="300">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="45"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!--edit, remove buttons-->
+                            <Border
+                                BorderBrush="{ThemeResource CircleElevationBorderBrush}"
+                                BorderThickness="1,0,0,0"
+                                Grid.Column="1">
+                                
+                                <StackPanel
+                                    Margin="0,10,0,10"
+                                    Orientation="Vertical"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Spacing="7">
+
+                                    <!--Delete and Modify commands from the ViewModel are called in code behind by Click events-->
+                                    <Button
+                                        x:Name="DeleteButton"
+                                        Height="30"
+                                        Width="30"
+                                        Click="DeleteButton_Click"
+                                        ToolTipService.ToolTip="Видалити команду">
+
+                                        <Viewbox
+                                            Margin="-4">
+                                            <SymbolIcon
+                                                Symbol="Delete"/>
+                                        </Viewbox>
+                                    </Button>
+
+                                    <!--Delete and Modify commands from the ViewModel are called in code behind by Click events-->
+                                    <Button
+                                        x:Name="ModifyButton"
+                                        Style="{ThemeResource AccentButtonStyle}"
+                                        Height="30"
+                                        Width="30"
+                                        Click="ModifyButton_Click"
+                                        ToolTipService.ToolTip="Редагувати команду">
+
+                                        <Viewbox
+                                            Margin="-4">
+                                            <SymbolIcon
+                                                Symbol="Edit"/>
+                                        </Viewbox>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+
+                            <ListView
+                                Grid.Column="0"
+                                Margin="0,10,0,10"
+                                ItemsSource="{Binding Actions}"
+                                ItemTemplateSelector="{StaticResource ShortActionTemplateSelector}">
+                            </ListView>
+
+                            <!--<TextBlock
+                                x:Name="NoActionsHint"
+                                Text="Немає жодної дії :("
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                
+                                <Interactivity:Interaction.Behaviors>
+                                    <Interactions:DataTriggerBehavior 
+                                        Binding="{Binding Actions.Count, Mode=OneWay}"
+                                        ComparisonCondition="GreaterThan"
+                                        Value="0">
+                                        <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoActionsHint, Mode=OneWay}" PropertyName="Visibility" Value="Collapsed" />
+                                    </Interactions:DataTriggerBehavior>
+                                    <Interactions:DataTriggerBehavior 
+                                        Binding="{Binding Actions.Count, Mode=OneWay}"
+                                        ComparisonCondition="Equal"
+                                        Value="0">
+                                        <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoActionsHint, Mode=OneWay}" PropertyName="Visibility" Value="Visible" />
+                                    </Interactions:DataTriggerBehavior>
+                                </Interactivity:Interaction.Behaviors>
+                            </TextBlock>-->
+                        </Grid>
+                    </Expander.Content>
+                </Expander>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!--Top panel-->
+        <Border>
+            <Grid
+                MinWidth="300"
+                MaxWidth="500">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <AutoSuggestBox 
+                    Grid.Column="0"
+                    PlaceholderText="Пошук"
+                    Height="35"
+                    QueryIcon="Find"
+                    Margin="10,0,0,0"
+                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"/>
+
+                <Button
+                    Margin="10,0,10,0"
+                    Grid.Column="1"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Content="Додати"
+                    Command="{x:Bind ViewModel.AddNewCustomCommand}"
+                    CommandParameter="{Binding ElementName=CustomCommandsPage, Path=XamlRoot}">
+                </Button>
+            </Grid>
+        </Border>
+
+        <!--Groups and commands list-->
+        <Grid
+            Grid.Row="1">
+
+            <ListBox
+                Background="Transparent"
+                ItemTemplate="{StaticResource CustomCommandItemTemplate}"
+                ItemsSource="{x:Bind ViewModel.AppState.CustomCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Margin" Value="10,0,10,5"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <ContentPresenter/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+
+            <TextBlock
+                x:Name="NoCommandHint"
+                Text="Немає жодної команди :("
+                FontSize="15"
+                FontWeight="SemiBold"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+    
+                    <Interactivity:Interaction.Behaviors>
+                        <Interactions:DataTriggerBehavior 
+                            Binding="{x:Bind ViewModel.AppState.CustomCommands.Count, Mode=OneWay}"
+                            ComparisonCondition="GreaterThan"
+                            Value="0">
+                            <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoCommandHint, Mode=OneTime}" PropertyName="Visibility" Value="Collapsed" />
+                        </Interactions:DataTriggerBehavior>
+                        <Interactions:DataTriggerBehavior 
+                            Binding="{x:Bind ViewModel.AppState.CustomCommands.Count, Mode=OneWay}"
+                            ComparisonCondition="Equal"
+                            Value="0">
+                            <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoCommandHint, Mode=OneTime}" PropertyName="Visibility" Value="Visible" />
+                        </Interactions:DataTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</Page>

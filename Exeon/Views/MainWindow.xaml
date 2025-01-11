@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Exeon.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Exeon"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="using:Exeon.Views.Pages"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Title="Exeon">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="48"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!--  TitleBar  -->
+            <RowDefinition Height="*" />
+            <!--  NavView  -->
+        </Grid.RowDefinitions>
+
+        <Border
+            x:Name="AppTitleBar"
+            Grid.Column="1"
+            Canvas.ZIndex="1"
+            IsHitTestVisible="True"
+            VerticalAlignment="Stretch"
+            Height="48">
+
+            <StackPanel
+                Margin="10,0,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="5">
+
+                <ImageIcon
+                    Height="25"
+                    Source="../Assets/temporaryLogo.png"/>
+
+                <TextBlock
+                    FontWeight="SemiBold"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Text="Exeon"/>
+            </StackPanel>
+        </Border>
+
+        <NavigationView 
+            x:Name="MainNavigationView"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
+
+            <NavigationView.Resources>
+                <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
+            </NavigationView.Resources>
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Message" Margin="0,20,0,0" Content="Історія запитів" Tag="Chat">
+                </NavigationViewItem>
+
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Bookmarks" Content="Команди" Tag="Commands">
+                </NavigationViewItem>
+
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Setting" Content="Налаштування" Tag="Settings"/>
+            </NavigationView.MenuItems>
+
+            <NavigationView.Content>
+                <Grid
+                    Padding="0"
+                    Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
+
+                    <Frame 
+                        x:Name="RootFrame"
+                        Margin="0,48,0,1"
+                        CornerRadius="5,5,0,0"
+                        BorderThickness="1,1,0,0"
+                        BorderBrush="{ThemeResource CircleElevationBorderBrush}"
+                        Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
+                    </Frame>
+                </Grid>
+            </NavigationView.Content>
+        </NavigationView>
+    </Grid>
+</Window>
