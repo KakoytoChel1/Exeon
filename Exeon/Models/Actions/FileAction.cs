@@ -4,6 +4,8 @@ namespace Exeon.Models.Actions
 {
     public class FileAction : Action
     {
+        public FileAction() { }
+
         public FileAction(string pathToFile)
         {
             PathToFile = pathToFile;

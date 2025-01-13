@@ -5,6 +5,8 @@ namespace Exeon.Models.Actions
 {
     public class PauseAction : Action
     {
+        public PauseAction() { }
+
         public PauseAction(long delay)
         {
             DelayInSeconds = delay;
@@ -14,7 +16,7 @@ namespace Exeon.Models.Actions
 
         public override Task Execute()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

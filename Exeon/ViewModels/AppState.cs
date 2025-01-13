@@ -1,29 +1,37 @@
 ﻿using Exeon.Models;
+using Exeon.Models.Actions;
 using Exeon.Models.Commands;
 using Exeon.ViewModels.Tools;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Action = Exeon.Models.Actions.Action;
 
 namespace Exeon.ViewModels
 {
-
-    /// <summary>
-    /// Stores global collections, properties, commands etc.
-    /// </summary>
     public class AppState : ObservableObject
     {
         public const int _navigationViewSidePanelAreaWidth = 48;
+        public CustomCommand? OriginalCommandState { get; set; }
 
         public AppState()
         {
-            //ApplicationContext = new ApplicationContext();
-            CustomCommands = new ObservableCollection<CustomCommand>();
+            ApplicationContext = new ApplicationContext();
+
+            var commands = ApplicationContext.CustomCommands
+                .Include(c => c.Actions)
+                .ToList();
+
+            CustomCommands = new ObservableCollection<CustomCommand>(commands);
         }
 
         #region Properties
 
         public ObservableCollection<CustomCommand> CustomCommands { get; set; }
 
-        //public ApplicationContext ApplicationContext { get; private set; }
+        public ApplicationContext ApplicationContext { get; private set; }
+
 
         private bool _isSidePanelButtonsEnabled;
         public bool IsSidePanelButtonsEnabled
@@ -33,11 +41,28 @@ namespace Exeon.ViewModels
         }
 
         private CustomCommand? _selectedModifyingCustomCommand;
+        /// <summary>
+        /// Stores a reference to the selected instance.
+        /// </summary>
         public CustomCommand? SelectedModifyingCustomCommand
         {
             get { return _selectedModifyingCustomCommand; }
             set { _selectedModifyingCustomCommand = value; OnPropertyChanged(); }
         }
         #endregion
+
+        // Создаем копию данных, таким образом избегая tracking'а со стороны DbContext
+        public Action CloneAction(Action action)
+        {
+            return action switch
+            {
+                FileAction fileAction => new FileAction(fileAction.PathToFile) { Id = fileAction.Id },
+                WebAction webAction => new WebAction(webAction.Uri) { Id = webAction.Id },
+                PauseAction pauseAction => new PauseAction(pauseAction.DelayInSeconds) { Id = pauseAction.Id },
+                SystemBrightnessAction brightnessAction => new SystemBrightnessAction(brightnessAction.BrightnessLevel) { Id = brightnessAction.Id },
+                SystemSoundAction soundAction => new SystemSoundAction(soundAction.SoundLevel) { Id = soundAction.Id },
+                _ => throw new NotSupportedException($"Unsupported action type: {action.GetType().Name}")
+            };
+        }
     }
 }

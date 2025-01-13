@@ -40,7 +40,7 @@
                                 Padding="10,5,10,5"
                                 BorderThickness="1.5"
                                 BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
-                                ToolTipService.ToolTip="{Binding Command}">
+                                ToolTipService.ToolTip="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                 
                                 <TextBlock
                                     x:Name="innerText"

@@ -4,6 +4,8 @@ namespace Exeon.Models.Actions
 {
     public class SystemSoundAction : Action
     {
+        public SystemSoundAction() { }
+
         public SystemSoundAction(int soundLevel)
         {
             SoundLevel = soundLevel; 

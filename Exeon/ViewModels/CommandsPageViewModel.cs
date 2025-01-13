@@ -1,12 +1,12 @@
-﻿using Exeon.Models;
+﻿using Exeon.Models.Actions;
 using Exeon.Models.Commands;
 using Exeon.Services.IServices;
 using Exeon.ViewModels.Tools;
 using Exeon.Views.Dialog_pages;
 using Exeon.Views.Pages;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 namespace Exeon.ViewModels
@@ -39,24 +39,30 @@ namespace Exeon.ViewModels
         {
             get
             {
-                _addNewCustomCommand = new RelayCommand(async (obj) =>
+                if( _addNewCustomCommand == null)
                 {
-                    // Getting xamlroot for using ContentDialog
-                    var xamlRoot = App.MainWindow.Content.XamlRoot;
-
-                    // Showing content dialog
-                    var result = await DialogManager.ShowContentDialog(xamlRoot, "Додавання команди",
-                        "Додати", ContentDialogButton.Primary, new AddNewCustomCommandPage(), closeBtnText: "Скасувати");
-
-                    await Task.Delay(10);
-
-                    // If was pressed primary button - adding new custom command
-                    if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(NewCustomCommandCommandText))
+                    _addNewCustomCommand = new RelayCommand(async (obj) =>
                     {
-                        AppState.CustomCommands.Add(new CustomCommand(NewCustomCommandCommandText));
-                        NewCustomCommandCommandText = string.Empty;
-                    }
-                });
+                        // Getting xamlroot for using ContentDialog
+                        var xamlRoot = App.MainWindow.Content.XamlRoot;
+
+                        // Showing content dialog
+                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Додавання команди",
+                            "Додати", ContentDialogButton.Primary, new AddNewCustomCommandPage(), closeBtnText: "Скасувати");
+
+                        // If was pressed primary button - adding new custom command
+                        if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(NewCustomCommandCommandText))
+                        {
+                            var newCommand = new CustomCommand(NewCustomCommandCommandText);
+                            AppState.CustomCommands.Add(newCommand);
+
+                            AppState.ApplicationContext.Add(newCommand);
+                            AppState.ApplicationContext.SaveChanges();
+
+                            NewCustomCommandCommandText = string.Empty;
+                        }
+                    });
+                }
                 return _addNewCustomCommand;
             }
         }
@@ -66,20 +72,23 @@ namespace Exeon.ViewModels
         {
             get
             {
-                _modifyCustomCommand = new RelayCommand((obj) =>
+                if(_modifyCustomCommand == null)
                 {
-                    if(obj is CustomCommand command)
+                    _modifyCustomCommand = new RelayCommand((obj) =>
                     {
-                        if(command != null)
+                        if (obj is CustomCommand command)
                         {
-                            AppState.SelectedModifyingCustomCommand = command;
+                            if (command != null)
+                            {
+                                StartEditingCommand(command);
 
-                            AppState.IsSidePanelButtonsEnabled = false;
+                                AppState.IsSidePanelButtonsEnabled = false;
 
-                            _navigationService.ChangePage<ModifyCommandPage>();
+                                _navigationService.ChangePage<ModifyCommandPage>();
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 return _modifyCustomCommand;
             }
         }
@@ -89,27 +98,51 @@ namespace Exeon.ViewModels
         {
             get
             {
-                _deleteCustomCommand = new RelayCommand(async (obj) =>
+                if(_deleteCustomCommand == null)
                 {
-                    if (obj is CustomCommand command)
+                    _deleteCustomCommand = new RelayCommand(async (obj) =>
                     {
-                        if (command != null)
+                        if (obj is CustomCommand command)
                         {
-                            var xamlRoot = App.MainWindow.Content.XamlRoot;
-
-                            var result = await DialogManager.ShowContentDialog(xamlRoot, "Видалення команди",
-                            "Видалити", ContentDialogButton.Primary, "Ви впевнені що бажаєте видалити обрану команду?", closeBtnText: "Скасувати");
-
-                            if(result == ContentDialogResult.Primary)
+                            if (command != null)
                             {
-                                AppState.CustomCommands.Remove(command);
+                                var xamlRoot = App.MainWindow.Content.XamlRoot;
+
+                                var result = await DialogManager.ShowContentDialog(xamlRoot, "Видалення команди",
+                                "Видалити", ContentDialogButton.Primary, "Ви впевнені що бажаєте видалити обрану команду?", closeBtnText: "Скасувати");
+
+                                if (result == ContentDialogResult.Primary)
+                                {
+                                    AppState.CustomCommands.Remove(command);
+
+                                    AppState.ApplicationContext.Remove(command);
+                                    AppState.ApplicationContext.SaveChanges();
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
                 return _deleteCustomCommand;
             }
         }
         #endregion
+
+
+        public void StartEditingCommand(CustomCommand commandToEdit)
+        {
+            if (commandToEdit != null)
+            {
+                // Глубокое копирование команды и ее действий
+                AppState.OriginalCommandState = new CustomCommand
+                {
+                    Command = commandToEdit.Command,
+                    Actions = new ObservableCollection<Action>(
+                        commandToEdit.Actions.Select(AppState.CloneAction)
+                    )
+                };
+
+                AppState.SelectedModifyingCustomCommand = commandToEdit;
+            }
+        }
     }
 }

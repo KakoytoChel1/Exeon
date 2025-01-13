@@ -111,13 +111,7 @@
 
                         <Viewbox
                             Margin="-4">
-                            <!--<SymbolIcon Symbol="Copy"/>-->
-
-                            <AnimatedIcon x:Name="CopyAnimationIcon">
-                                <AnimatedIcon.Source>
-                                    <animatedVisuals:AnimatedAcceptVisualSource/>
-                                </AnimatedIcon.Source>
-                            </AnimatedIcon>
+                            <SymbolIcon Symbol="Copy"/>
                         </Viewbox>
                     </Button>
 
@@ -398,7 +392,8 @@
 
                     <Button
                         Style="{ThemeResource AccentButtonStyle}"
-                        Padding="10,7,10,7">
+                        Padding="10,7,10,7"
+                        Command="{x:Bind ViewModel.SaveChanges}">
                         <StackPanel
                             Spacing="7"
                             Orientation="Horizontal">

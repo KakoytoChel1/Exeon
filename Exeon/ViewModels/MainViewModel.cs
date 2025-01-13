@@ -32,24 +32,27 @@ namespace Exeon.ViewModels
         {
             get
             {
-                _navigatePageCommand = new RelayCommand((obj) =>
+                if(_navigatePageCommand == null)
                 {
-                    if(obj is string tag)
+                    _navigatePageCommand = new RelayCommand((obj) =>
                     {
-                        switch(tag)
+                        if (obj is string tag)
                         {
-                            case "Chat":
-                                _navigationService.ChangePage<ChatPage>(SlideNavigationTransitionEffect.FromLeft);
-                                break;
-                            case "Commands":
-                                _navigationService.ChangePage<CommandsPage>(SlideNavigationTransitionEffect.FromLeft);
-                                break;
-                            case "Settings":
-                                _navigationService.ChangePage<SettingsPage>(SlideNavigationTransitionEffect.FromLeft);
-                                break;
+                            switch (tag)
+                            {
+                                case "Chat":
+                                    _navigationService.ChangePage<ChatPage>(SlideNavigationTransitionEffect.FromLeft);
+                                    break;
+                                case "Commands":
+                                    _navigationService.ChangePage<CommandsPage>(SlideNavigationTransitionEffect.FromLeft);
+                                    break;
+                                case "Settings":
+                                    _navigationService.ChangePage<SettingsPage>(SlideNavigationTransitionEffect.FromLeft);
+                                    break;
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 return _navigatePageCommand;
             }
         }

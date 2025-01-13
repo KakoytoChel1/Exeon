@@ -1,13 +1,14 @@
-﻿using Exeon.Models.Commands;
-using Exeon.Services;
-using Exeon.Services.IServices;
+﻿using Exeon.Services.IServices;
 using Exeon.ViewModels.Tools;
-using Microsoft.UI.Xaml;
 using System.Windows.Input;
 using Microsoft.UI.Xaml.Controls;
 using Exeon.Views.Dialog_pages;
-using System;
+using Action = Exeon.Models.Actions.Action;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Exeon.Models.Actions;
+using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace Exeon.ViewModels
 {
@@ -61,162 +62,238 @@ namespace Exeon.ViewModels
         #endregion
 
         #region Commands
-
         private ICommand? _cancelModifyingCommand;
-        public ICommand? CancelModifyingCommand
+        public ICommand CancelModifyingCommand
         {
             get
             {
-                _cancelModifyingCommand = new RelayCommand((obj) =>
+                if (_cancelModifyingCommand == null)
                 {
-                    AppState.SelectedModifyingCustomCommand = null;
-                    AppState.IsSidePanelButtonsEnabled = true;
+                    _cancelModifyingCommand = new RelayCommand((obj) =>
+                    {
+                        if (AppState.OriginalCommandState != null && AppState.SelectedModifyingCustomCommand != null)
+                        {
+                            // Восстановление оригинального состояния команды
+                            AppState.SelectedModifyingCustomCommand.Command = AppState.OriginalCommandState.Command;
+                            AppState.SelectedModifyingCustomCommand.Actions = new ObservableCollection<Action>(
+                                AppState.OriginalCommandState.Actions.Select(AppState.CloneAction));
+                        }
 
-                    _navigationService.GoBack();
-                });
+                        AppState.IsSidePanelButtonsEnabled = true;
+                        _navigationService.GoBack();
+                    });
+                }
                 return _cancelModifyingCommand;
             }
         }
 
-        
-        private ICommand? _addNewWebActionCommand;
-        private ICommand? _addNewPauseActionCommand;
-        private ICommand? _addNewBrightnessActionCommand;
-        private ICommand? _addNewSoundActionCommand;
+        private ICommand? _saveChanges;
+        public ICommand SaveChanges
+        {
+            get
+            {
+                if (_saveChanges == null)
+                {
+                    _saveChanges = new RelayCommand((obj) =>
+                    {
+                        AppState.ApplicationContext.SaveChanges();
+
+                        AppState.IsSidePanelButtonsEnabled = true;
+                        _navigationService.GoBack();
+                    });
+                }
+                return _saveChanges;
+            }
+        }
 
         private ICommand? _addNewFileActionCommand;
         public ICommand AddNewFileActionCommand
         {
             get
             {
-                _addNewFileActionCommand = new RelayCommand(async (obj) =>
+                if (_addNewFileActionCommand == null)
                 {
-                    var xamlRoot = App.MainWindow.Content.XamlRoot;
+                    _addNewFileActionCommand = new RelayCommand(async (obj) =>
+                    {
+                        var xamlRoot = App.MainWindow.Content.XamlRoot;
 
-                    var result = await DialogManager.ShowContentDialog(xamlRoot, "Відкриття файлу", "Додати",
+                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Відкриття файлу", "Додати",
                             ContentDialogButton.Primary, new AddNewFileActionPage(), closeBtnText: "Скасувати");
-                    AddNewAction(typeof(FileAction), result);
-                });
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            if (!string.IsNullOrWhiteSpace(NewFileActionPath) && AppState.SelectedModifyingCustomCommand != null)
+                            {
+                                var newAction = new FileAction(NewFileActionPath)
+                                {
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                };
+
+                                AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+                            }
+                        }
+                    });
+                }
                 return _addNewFileActionCommand;
             }
         }
 
+        private ICommand? _addNewWebActionCommand;
         public ICommand? AddNewWebActionCommand
         {
             get
             {
-                _addNewWebActionCommand = new RelayCommand(async (obj) =>
+                if( _addNewWebActionCommand == null)
                 {
-                    var xamlRoot = App.MainWindow.Content.XamlRoot;
+                    _addNewWebActionCommand = new RelayCommand(async (obj) =>
+                    {
+                        var xamlRoot = App.MainWindow.Content.XamlRoot;
 
-                    var result = await DialogManager.ShowContentDialog(xamlRoot, "Відкриття веб-сторінки", "Додати",
-                        ContentDialogButton.Primary, new AddNewWebActionPage(), closeBtnText: "Скасувати");
-                    AddNewAction(typeof(WebAction), result);
-                });
+                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Відкриття веб-сторінки", "Додати",
+                            ContentDialogButton.Primary, new AddNewWebActionPage(), closeBtnText: "Скасувати");
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            if(!string.IsNullOrWhiteSpace(NewWebActionUri) && AppState.SelectedModifyingCustomCommand != null)
+                            {
+                                var newAction = new WebAction(NewWebActionUri)
+                                {
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                };
+
+                                AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+                            }
+                        }
+                    });
+                }
                 return _addNewWebActionCommand;
             }
         }
 
+        private ICommand? _addNewPauseActionCommand;
         public ICommand? AddNewPauseActionCommand
         {
             get
             {
-                _addNewPauseActionCommand = new RelayCommand(async (obj) =>
+                if(_addNewPauseActionCommand == null)
                 {
-                    var xamlRoot = App.MainWindow.Content.XamlRoot;
+                    _addNewPauseActionCommand = new RelayCommand(async (obj) =>
+                    {
+                        var xamlRoot = App.MainWindow.Content.XamlRoot;
 
-                    var result = await DialogManager.ShowContentDialog(xamlRoot, "Додавання паузи", "Додати",
-                        ContentDialogButton.Primary, new AddNewPauseActionPage(), closeBtnText: "Скасувати");
-                    AddNewAction(typeof(PauseAction), result);
-                });
+                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Додавання паузи", "Додати",
+                            ContentDialogButton.Primary, new AddNewPauseActionPage(), closeBtnText: "Скасувати");
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            if(NewPauseActionDelay > 0 && AppState.SelectedModifyingCustomCommand != null)
+                            {
+                                var newAction = new PauseAction(Convert.ToInt64(NewPauseActionDelay))
+                                {
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                };
+
+                                AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+                            }
+                        }
+                    });
+                }
                 return _addNewPauseActionCommand;
             }
         }
 
+        private ICommand? _addNewBrightnessActionCommand;
         public ICommand? AddNewBrightnessActionCommand
         {
             get
             {
-                _addNewBrightnessActionCommand = new RelayCommand(async (obj) =>
+                if(_addNewBrightnessActionCommand == null)
                 {
-                    var xamlRoot = App.MainWindow.Content.XamlRoot;
+                    _addNewBrightnessActionCommand = new RelayCommand(async (obj) =>
+                    {
+                        var xamlRoot = App.MainWindow.Content.XamlRoot;
 
-                    var result = await DialogManager.ShowContentDialog(xamlRoot, "Зміна рівня яскравості", "Додати",
-                        ContentDialogButton.Primary, new AddNewBrightnessActionPage(), closeBtnText: "Скасувати");
-                    AddNewAction(typeof(SystemBrightnessAction), result);
-                });
+                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Зміна рівня яскравості", "Додати",
+                            ContentDialogButton.Primary, new AddNewBrightnessActionPage(), closeBtnText: "Скасувати");
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            if((NewBrightnessActionLevel >= 0 && NewBrightnessActionLevel <= 100) && AppState.SelectedModifyingCustomCommand != null)
+                            {
+                                var newAction = new SystemBrightnessAction(NewBrightnessActionLevel)
+                                {
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                };
+
+                                AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+                            }
+                        }
+                    });
+                }
                 return _addNewBrightnessActionCommand;
             }
         }
 
+        private ICommand? _addNewSoundActionCommand;
         public ICommand? AddNewSoundActionCommand
         {
             get
             {
-                _addNewSoundActionCommand = new RelayCommand(async (obj) =>
+                if(_addNewSoundActionCommand == null)
                 {
-                    var xamlRoot = App.MainWindow.Content.XamlRoot;
+                    _addNewSoundActionCommand = new RelayCommand(async (obj) =>
+                    {
+                        var xamlRoot = App.MainWindow.Content.XamlRoot;
 
-                    var result = await DialogManager.ShowContentDialog(xamlRoot, "Зміна рівня гучності", "Додати",
-                        ContentDialogButton.Primary, new AddNewSoundActionPage(), closeBtnText: "Скасувати");
-                    AddNewAction(typeof(SystemSoundAction), result);
-                });
+                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Зміна рівня гучності", "Додати",
+                            ContentDialogButton.Primary, new AddNewSoundActionPage(), closeBtnText: "Скасувати");
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            if((NewSoundActionLevel >= 0 && NewSoundActionLevel <= 100) && AppState.SelectedModifyingCustomCommand != null)
+                            {
+                                var newAction = new SystemSoundAction(NewSoundActionLevel)
+                                {
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                };
+
+                                AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+                            }
+                        }
+                    });
+                }
                 return _addNewSoundActionCommand;
             }
         }
 
         private ICommand? _deleteActionCommand;
-        public ICommand? DeleteActionCommand
+        public ICommand DeleteActionCommand
         {
             get
             {
-                _deleteActionCommand = new RelayCommand((obj) =>
+                if (_deleteActionCommand == null)
                 {
-                    if(obj is Models.Actions.Action action)
+                    _deleteActionCommand = new RelayCommand((obj) =>
                     {
-                        var xamlRoot = App.MainWindow.Content.XamlRoot;
+                        if (obj is Action action && AppState.SelectedModifyingCustomCommand != null)
+                        {
+                            AppState.SelectedModifyingCustomCommand.Actions.Remove(action);
 
-                        AppState.SelectedModifyingCustomCommand!.Actions.Remove(action);
-                    }
-                });
+
+                            // Проверяем, отслеживается ли действие в контексте
+                            if (AppState.ApplicationContext.Entry(action).State != EntityState.Detached)
+                            {
+                                AppState.ApplicationContext.Actions.Remove(action);
+                            }
+                        }
+                    });
+                }
                 return _deleteActionCommand;
             }
         }
         #endregion
 
         #region Methods
-
-        private void AddNewAction(Type type, ContentDialogResult result)
-        {
-            if(result == ContentDialogResult.Primary)
-            {
-                if (type == typeof(FileAction) && !string.IsNullOrWhiteSpace(NewFileActionPath))
-                {
-                    AppState.SelectedModifyingCustomCommand!.Actions.Add(
-                        new FileAction(NewFileActionPath));
-                }
-                else if (type == typeof(WebAction) && !string.IsNullOrWhiteSpace(NewWebActionUri))
-                {
-                    AppState.SelectedModifyingCustomCommand!.Actions.Add(
-                        new WebAction(NewWebActionUri));
-                }
-                else if (type == typeof(PauseAction) && NewPauseActionDelay != default)
-                {
-                    AppState.SelectedModifyingCustomCommand!.Actions.Add(
-                        new PauseAction(Convert.ToInt64(NewPauseActionDelay)));
-                }
-                else if (type == typeof(SystemBrightnessAction) && (NewBrightnessActionLevel >= 0 && NewBrightnessActionLevel <= 100))
-                {
-                    AppState.SelectedModifyingCustomCommand!.Actions.Add(
-                        new SystemBrightnessAction(NewBrightnessActionLevel));
-                }
-                else if (type == typeof(SystemSoundAction) && (NewSoundActionLevel >= 0 && NewSoundActionLevel <= 100))
-                {
-                    AppState.SelectedModifyingCustomCommand!.Actions.Add(
-                        new SystemSoundAction(NewSoundActionLevel));
-                }
-            }
-        }
         #endregion
     }
 }

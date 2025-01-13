@@ -4,6 +4,8 @@ namespace Exeon.Models.Actions
 {
     public class SystemBrightnessAction : Action
     {
+        public SystemBrightnessAction() { }
+
         public SystemBrightnessAction(int brightnessLevel)
         {
             BrightnessLevel = brightnessLevel;
