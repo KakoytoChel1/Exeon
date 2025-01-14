@@ -135,6 +135,7 @@ namespace Exeon.ViewModels
                 // Глубокое копирование команды и ее действий
                 AppState.OriginalCommandState = new CustomCommand
                 {
+                    Id = commandToEdit.Id,
                     Command = commandToEdit.Command,
                     Actions = new ObservableCollection<Action>(
                         commandToEdit.Actions.Select(AppState.CloneAction)

@@ -7,7 +7,9 @@ using Size = System.Drawing.Size;
 using Point = System.Drawing.Point;
 using Exeon.Services.IServices;
 using Exeon.Services;
+using Microsoft.UI.Xaml.Controls;
 using Exeon.Views.Pages;
+using Exeon.ViewModels.Tools;
 
 namespace Exeon
 {
@@ -16,11 +18,27 @@ namespace Exeon
         public static IServiceProvider Services { get; private set; } = null!;
         private static WindowHelper? _windowHelper;
 
-        public static MainWindow MainWindow { get; private set; }
+        public static MainWindow MainWindow { get; private set; } = null!;
 
         public App()
         {
             this.InitializeComponent();
+            UnhandledException += App_UnhandledException;
+        }
+
+        private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+            var exeption = e.Exception;
+
+            // Logger here
+            // ...
+
+            if(MainWindow != null)
+            {
+                await DialogManager.ShowContentDialog(MainWindow.Content.XamlRoot, 
+                    "UnhandledException", "Okay", ContentDialogButton.Primary, $"{exeption.Message}");
+            }  
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -31,11 +49,12 @@ namespace Exeon
             serviceCollection.AddSingleton<CommandsPageViewModel>();
             serviceCollection.AddSingleton<ModifyCommandPageViewModel>();
             serviceCollection.AddSingleton<ChatPageViewModel>();
-            serviceCollection.AddSingleton<SettingsPageViewModel>();
+            //serviceCollection.AddSingleton<SettingsPageViewModel>();
 
             // Intialization of the RootFrame and setting first selected page is in main window's code behind (MainWindow.xaml.cs)
             serviceCollection.AddSingleton<INavigationService, NavigationService>();
             serviceCollection.AddSingleton<IConfigurationService, ConfigurationService>();
+            serviceCollection.AddSingleton<DispatcherQueueProvider>(); // Initializing in MainWindow's code behind (MainWindow.xaml.cs)
 
             Services = serviceCollection.BuildServiceProvider();
 

@@ -3,24 +3,28 @@ using Exeon.ViewModels.Tools;
 using System.Windows.Input;
 using Microsoft.UI.Xaml.Controls;
 using Exeon.Views.Dialog_pages;
-using Action = Exeon.Models.Actions.Action;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Exeon.Models.Actions;
 using System;
 using Microsoft.EntityFrameworkCore;
+using Action = Exeon.Models.Actions.Action;
+using System.Threading.Tasks;
+using Exeon.Services;
 
 namespace Exeon.ViewModels
 {
     public class ModifyCommandPageViewModel : ObservableObject
     {
         private readonly INavigationService _navigationService;
+        private readonly DispatcherQueueProvider _dispatcherQueueProvider;
         public AppState AppState { get; }
 
-        public ModifyCommandPageViewModel(INavigationService navigationService, AppState appState)
+        public ModifyCommandPageViewModel(INavigationService navigationService, AppState appState, DispatcherQueueProvider dispatcherQueueProvider)
         {
             _navigationService = navigationService;
             AppState = appState;
+            _dispatcherQueueProvider = dispatcherQueueProvider;
         }
 
         #region Properties
@@ -74,6 +78,7 @@ namespace Exeon.ViewModels
                         if (AppState.OriginalCommandState != null && AppState.SelectedModifyingCustomCommand != null)
                         {
                             // Восстановление оригинального состояния команды
+                            AppState.SelectedModifyingCustomCommand.Id = AppState.OriginalCommandState.Id;
                             AppState.SelectedModifyingCustomCommand.Command = AppState.OriginalCommandState.Command;
                             AppState.SelectedModifyingCustomCommand.Actions = new ObservableCollection<Action>(
                                 AppState.OriginalCommandState.Actions.Select(AppState.CloneAction));
@@ -126,10 +131,13 @@ namespace Exeon.ViewModels
                             {
                                 var newAction = new FileAction(NewFileActionPath)
                                 {
-                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id,
+                                    OrderIndex = AppState.SelectedModifyingCustomCommand.Actions.Count + 1
                                 };
 
                                 AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+
+                                NewFileActionPath = string.Empty;
                             }
                         }
                     });
@@ -158,10 +166,13 @@ namespace Exeon.ViewModels
                             {
                                 var newAction = new WebAction(NewWebActionUri)
                                 {
-                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id,
+                                    OrderIndex = AppState.SelectedModifyingCustomCommand.Actions.Count + 1
                                 };
 
                                 AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+
+                                NewWebActionUri = string.Empty;
                             }
                         }
                     });
@@ -190,10 +201,13 @@ namespace Exeon.ViewModels
                             {
                                 var newAction = new PauseAction(Convert.ToInt64(NewPauseActionDelay))
                                 {
-                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id,
+                                    OrderIndex = AppState.SelectedModifyingCustomCommand.Actions.Count + 1
                                 };
 
                                 AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+
+                                NewPauseActionDelay = 0;
                             }
                         }
                     });
@@ -222,10 +236,13 @@ namespace Exeon.ViewModels
                             {
                                 var newAction = new SystemBrightnessAction(NewBrightnessActionLevel)
                                 {
-                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id,
+                                    OrderIndex = AppState.SelectedModifyingCustomCommand.Actions.Count + 1
                                 };
 
                                 AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+
+                                NewBrightnessActionLevel = 0;
                             }
                         }
                     });
@@ -254,10 +271,13 @@ namespace Exeon.ViewModels
                             {
                                 var newAction = new SystemSoundAction(NewSoundActionLevel)
                                 {
-                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id
+                                    RootCommandId = AppState.SelectedModifyingCustomCommand.Id,
+                                    OrderIndex = AppState.SelectedModifyingCustomCommand.Actions.Count + 1
                                 };
 
                                 AppState.SelectedModifyingCustomCommand.Actions.Add(newAction);
+
+                                NewSoundActionLevel = 0;
                             }
                         }
                     });
@@ -279,7 +299,6 @@ namespace Exeon.ViewModels
                         {
                             AppState.SelectedModifyingCustomCommand.Actions.Remove(action);
 
-
                             // Проверяем, отслеживается ли действие в контексте
                             if (AppState.ApplicationContext.Entry(action).State != EntityState.Detached)
                             {
@@ -289,6 +308,36 @@ namespace Exeon.ViewModels
                     });
                 }
                 return _deleteActionCommand;
+            }
+        }
+
+        private ICommand? _changeOrderInActionCollection;
+        public ICommand ChangeOrderInActionCollection
+        {
+            get
+            {
+                if(_changeOrderInActionCollection == null)
+                {
+                    _changeOrderInActionCollection = new RelayCommand(async (obj) =>
+                    {
+                        await Task.Run(() =>
+                        {
+                            var selectedCommand = AppState.SelectedModifyingCustomCommand;
+
+                            if (selectedCommand != null)
+                            {
+                                int index = 0;
+                                foreach (var action in selectedCommand.Actions)
+                                {
+                                    action.OrderIndex = index++;
+                                }
+
+                                AppState.ApplicationContext.UpdateRange(selectedCommand.Actions);
+                            }
+                        });
+                    });
+                }
+                return _changeOrderInActionCollection;
             }
         }
         #endregion

@@ -70,7 +70,7 @@
                 <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Bookmarks" Content="Команди" Tag="Commands">
                 </NavigationViewItem>
 
-                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Setting" Content="Налаштування" Tag="Settings"/>
+                <!--<NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Setting" Content="Налаштування" Tag="Settings"/>-->
             </NavigationView.MenuItems>
 
             <NavigationView.Content>

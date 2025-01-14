@@ -352,6 +352,7 @@
             CanReorderItems="True"
             AllowDrop="True"
             CanDragItems="True"
+            DragItemsCompleted="ListView_DragItemsCompleted"
             Grid.Row="1"
             ItemTemplateSelector="{StaticResource ActionTemplateSelector}"
             ItemsSource="{x:Bind ViewModel.AppState.SelectedModifyingCustomCommand.Actions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">

@@ -14,9 +14,14 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\brightness.png" />
+    <None Remove="Assets\check.png" />
+    <None Remove="Assets\check_success.png" />
     <None Remove="Assets\clock.png" />
+    <None Remove="Assets\cross.png" />
+    <None Remove="Assets\cross_fail.png" />
     <None Remove="Assets\folder.png" />
     <None Remove="Assets\sound.png" />
+    <None Remove="Assets\SuccessIcon.png" />
     <None Remove="Assets\web.png" />
     <None Remove="Views\Dialog pages\AddNewBrightnessActionPage.xaml" />
     <None Remove="Views\Dialog pages\AddNewCustomCommandPage.xaml" />

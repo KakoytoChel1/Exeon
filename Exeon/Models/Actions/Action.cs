@@ -7,6 +7,8 @@ namespace Exeon.Models.Actions
     {
         public int Id { get; set; }
 
+        public int OrderIndex { get; set; }
+
         public CustomCommand RootCommand { get; set; } = null!;
         public int RootCommandId { get; set; }
 

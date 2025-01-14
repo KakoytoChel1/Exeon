@@ -1,9 +1,11 @@
-﻿using Exeon.Services.IServices;
+﻿using Exeon.Services;
+using Exeon.Services.IServices;
 using Exeon.ViewModels;
 using Exeon.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Dispatching;
 using System.Linq;
 
 namespace Exeon
@@ -22,6 +24,7 @@ namespace Exeon
             var coreTitleBar = AppWindow.TitleBar;
             coreTitleBar.PreferredHeightOption = Microsoft.UI.Windowing.TitleBarHeightOption.Tall;
 
+            App.Services.GetRequiredService<DispatcherQueueProvider>().Initialize(DispatcherQueue.GetForCurrentThread());
             ViewModel = App.Services.GetRequiredService<MainViewModel>();
 
             var navigationService = App.Services.GetRequiredService<INavigationService>();

@@ -19,12 +19,14 @@ namespace Exeon.ViewModels
         {
             ApplicationContext = new ApplicationContext();
 
+            // Загружаем команды с отсортированными действиями на уровне базы данных
             var commands = ApplicationContext.CustomCommands
-                .Include(c => c.Actions)
+                .Include(c => c.Actions.OrderBy(a => a.OrderIndex)) // Сортируем действия
                 .ToList();
 
             CustomCommands = new ObservableCollection<CustomCommand>(commands);
         }
+
 
         #region Properties
 

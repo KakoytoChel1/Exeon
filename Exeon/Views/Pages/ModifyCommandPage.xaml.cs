@@ -91,5 +91,10 @@ namespace Exeon.Views.Pages
                 Clipboard.SetContent(dataPackage);
             }
         }
+
+        private void ListView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+        {
+            ViewModel.ChangeOrderInActionCollection.Execute(null);
+        }
     }
 }

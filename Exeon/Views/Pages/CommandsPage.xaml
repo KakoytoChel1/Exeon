@@ -193,25 +193,26 @@
         <Grid
             Grid.Row="1">
 
-            <ListBox
+            <ListView
                 Background="Transparent"
+                SelectionMode="None"
                 ItemTemplate="{StaticResource CustomCommandItemTemplate}"
                 ItemsSource="{x:Bind ViewModel.AppState.CustomCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <Setter Property="Margin" Value="10,0,10,5"/>
                         <Setter Property="Template">
                             <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
+                                <ControlTemplate TargetType="ListViewItem">
                                     <ContentPresenter/>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+                </ListView.ItemContainerStyle>
+            </ListView>
 
             <TextBlock
                 x:Name="NoCommandHint"

@@ -1,5 +1,4 @@
 ﻿using Exeon.Models.Actions;
-using Exeon.Models.Chat;
 using Exeon.Models.Commands;
 using Microsoft.EntityFrameworkCore;
 
