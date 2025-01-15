@@ -214,14 +214,14 @@
                 </ListView.ItemContainerStyle>
             </ListView>
 
-            <TextBlock
+            <!--<TextBlock
                 x:Name="NoCommandHint"
                 Text="Немає жодної команди :("
-                FontSize="15"
-                FontWeight="SemiBold"
+                FontSize="18"
+                FontWeight="SemiLight"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                Foreground="{ThemeResource TextFillColorDisabledBrush}">
     
                     <Interactivity:Interaction.Behaviors>
                         <Interactions:DataTriggerBehavior 
@@ -237,7 +237,43 @@
                             <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoCommandHint, Mode=OneTime}" PropertyName="Visibility" Value="Visible" />
                         </Interactions:DataTriggerBehavior>
                     </Interactivity:Interaction.Behaviors>
-            </TextBlock>
+            </TextBlock>-->
         </Grid>
+
+        <StackPanel
+            Grid.RowSpan="2"
+            x:Name="NoCommandHint"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="5">
+
+            <TextBlock
+             Text="Немає жодної команди"
+             FontSize="18"
+             FontWeight="SemiLight"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             Foreground="{ThemeResource TextFillColorDisabledBrush}"/>
+
+            <ImageIcon
+                Width="55"
+                Source="../../Assets/list.png"/>
+
+            <Interactivity:Interaction.Behaviors>
+                <Interactions:DataTriggerBehavior 
+                    Binding="{x:Bind ViewModel.AppState.CustomCommands.Count, Mode=OneWay}"
+                    ComparisonCondition="GreaterThan"
+                    Value="0">
+                    <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoCommandHint, Mode=OneTime}" PropertyName="Visibility" Value="Collapsed" />
+                </Interactions:DataTriggerBehavior>
+                <Interactions:DataTriggerBehavior 
+                    Binding="{x:Bind ViewModel.AppState.CustomCommands.Count, Mode=OneWay}"
+                    ComparisonCondition="Equal"
+                    Value="0">
+                    <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoCommandHint, Mode=OneTime}" PropertyName="Visibility" Value="Visible" />
+                </Interactions:DataTriggerBehavior>
+            </Interactivity:Interaction.Behaviors>
+        </StackPanel>
     </Grid>
 </Page>

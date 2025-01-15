@@ -1,4 +1,5 @@
 ﻿using Exeon.Models.Commands;
+using System;
 using System.Threading.Tasks;
 
 namespace Exeon.Models.Actions
@@ -12,6 +13,6 @@ namespace Exeon.Models.Actions
         public CustomCommand RootCommand { get; set; } = null!;
         public int RootCommandId { get; set; }
 
-        public abstract Task Execute();
+        public abstract Task<ValueTuple<bool, string>> Execute();
     }
 }

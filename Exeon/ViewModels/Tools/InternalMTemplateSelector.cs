@@ -9,6 +9,7 @@ namespace Exeon.ViewModels.Tools
         public DataTemplate? AssistantActionSucceededMessageTemplate { get; set; }
         public DataTemplate? AssistantActionFailedMessageTemplate { get; set; }
         public DataTemplate? AssistantActionDelayMessageTemplate { get; set; }
+        public DataTemplate? AssistantSimpleMessageTemplate { get; set; }
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
@@ -17,6 +18,7 @@ namespace Exeon.ViewModels.Tools
                 AssistantActionSucceededMessageItem => AssistantActionSucceededMessageTemplate!,
                 AssistantActionFailedMessageItem => AssistantActionFailedMessageTemplate!,
                 AssistantActionDelayMessageItem => AssistantActionDelayMessageTemplate!,
+                AssistantSimpleMessageItem => AssistantSimpleMessageTemplate!,
                 _ => base.SelectTemplateCore(item, container)
             };
         }

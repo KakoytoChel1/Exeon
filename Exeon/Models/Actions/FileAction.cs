@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Exeon.Models.Actions
 {
@@ -13,9 +15,18 @@ namespace Exeon.Models.Actions
 
         public string PathToFile { get; set; } = null!;
 
-        public override Task Execute()
+        public override Task<ValueTuple<bool, string>> Execute()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                Process.Start(new ProcessStartInfo { FileName = PathToFile, UseShellExecute = true });
+                return Task.FromResult(ValueTuple.Create(true, $"Успішно відкрито файл за шляхом: {PathToFile}."));
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(ValueTuple.Create(false, ex.Message));
+            }
         }
+
     }
 }

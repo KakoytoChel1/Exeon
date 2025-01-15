@@ -15,7 +15,10 @@
 
     <tools:MessageTemplateSelector x:Key="MessageTemplateSelector"
         UserMessageTemplate="{StaticResource UserMessageTemplate}"
-        AssistantMessageTemplate="{StaticResource AssistantMessageTemplate}"/>
+        AssistantSimpleMessageTemplate="{StaticResource AssistantSimpleMessageTemplate}"
+        AssistantActionSucceededMessageTemplate="{StaticResource AssistantActionSucceededMessageTemplate}"
+        AssistantActionFailedMessageTemplate="{StaticResource AssistantActionFailedMessageTemplate}"
+        AssistantActionDelayMessageTemplate="{StaticResource AssistantActionDelayMessageTemplate}"/>
 
     <tools:ActionTemplateSelector 
         x:Key="ShortActionTemplateSelector" 
@@ -26,9 +29,7 @@
         SoundActionTemplate="{StaticResource SoundActionTemplateShort}"/>
 
     <tools:InternalMTemplateSelector x:Key="InternalMTemplateSelector"
-        AssistantActionSucceededMessageTemplate="{StaticResource AssistantActionSucceededMessageTemplate}"
-        AssistantActionFailedMessageTemplate="{StaticResource AssistantActionFailedMessageTemplate}"
-        AssistantActionDelayMessageTemplate="{StaticResource AssistantActionDelayMessageTemplate}"/>
+        AssistantSimpleMessageTemplate="{StaticResource AssistantSimpleMessageTemplate}"/>
 
     <Style TargetType="TextBox" x:Key="TransparentTextBoxStyle">
         <Setter Property="Template">
@@ -102,12 +103,12 @@
         <Setter Property="PlaceholderForeground" Value="Gray" />
     </Style>
 
-    <!-- UserMessageItem -->
+    <!-- UserMessageItem template-->
     <DataTemplate x:Key="UserMessageTemplate">
         <StackPanel 
             MaxWidth="500"
             HorizontalAlignment="Left"
-            Margin="10,0,30,5">
+            Margin="10,0,30,10">
             
             <Border 
                 Background="{ThemeResource AccentFillColorDefaultBrush}" 
@@ -115,10 +116,11 @@
                 Padding="10,8,10,10">
 
                 <TextBlock  
+                    Text="{Binding Text}"
+                    HorizontalAlignment="Center"
                     TextWrapping="Wrap"
                     FontSize="13"
                     Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}">
-                    <Run Text="{Binding Text}"/>
                 </TextBlock>
             </Border>
 
@@ -131,42 +133,30 @@
         </StackPanel>
     </DataTemplate>
 
-    <!-- AssistantMessageItem -->
-    <DataTemplate x:Key="AssistantMessageTemplate">
+    <!-- AssistantMessageItem templates-->
+    <DataTemplate x:Key="AssistantSimpleMessageTemplate">
         <StackPanel 
             MaxWidth="500"
             HorizontalAlignment="Left"
-            Margin="10,0,30,15">
-            
+            Margin="10,0,30,10">
+
             <Border 
-                Background="Transparent" 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                 CornerRadius="7"
-                Padding="0,8,10,0">
+                Padding="10,8,10,10">
 
-                <ListBox
-                    ItemTemplateSelector="{StaticResource InternalMTemplateSelector}"
-                    Background="Transparent"
-                    ItemsSource="{Binding MessageItems}">
-
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <ContentPresenter/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
+                <TextBlock  
+                    TextWrapping="Wrap"
+                    FontSize="13"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}">
+                        <Run Text="{Binding Text}"/>
+                </TextBlock>
             </Border>
 
             <TextBlock
                 Foreground="{ThemeResource TextFillColorDisabledBrush}"
                 HorizontalAlignment="Left"
-                Margin="5,-3,0,0"
+                Margin="5,0,0,0"
                 FontSize="11"
                 Text="{Binding SendingTime, Converter={StaticResource DateTimeToStringConverter}}"/>
         </StackPanel>
@@ -176,7 +166,7 @@
         <StackPanel 
             MaxWidth="500"
             HorizontalAlignment="Left"
-            Margin="0,0,0,6">
+            Margin="10,0,30,10">
 
             <Border 
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
@@ -230,6 +220,13 @@
                     </Expander>
                 </Grid>
             </Border>
+
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorDisabledBrush}"
+                HorizontalAlignment="Left"
+                Margin="5,0,0,0"
+                FontSize="11"
+                Text="{Binding SendingTime, Converter={StaticResource DateTimeToStringConverter}}"/>
         </StackPanel>
     </DataTemplate>
 
@@ -237,7 +234,7 @@
         <StackPanel 
             MaxWidth="500"
             HorizontalAlignment="Left"
-            Margin="0,0,0,6">
+            Margin="10,0,30,10">
 
             <Border 
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
@@ -291,6 +288,13 @@
                     </Expander>
                 </Grid>
             </Border>
+
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorDisabledBrush}"
+                HorizontalAlignment="Left"
+                Margin="5,0,0,0"
+                FontSize="11"
+                Text="{Binding SendingTime, Converter={StaticResource DateTimeToStringConverter}}"/>
         </StackPanel>
     </DataTemplate>
 
@@ -298,49 +302,47 @@
         <StackPanel 
             MaxWidth="500"
             HorizontalAlignment="Left"
-            Margin="0,0,0,6">
+            Margin="10,0,30,10">
 
             <Border 
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                 CornerRadius="7">
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
+                <!--header-->
+                <StackPanel
+                    x:Name="headerStack"
+                    Padding="10,10,13,10"
+                    Orientation="Horizontal"
+                    Spacing="10">
 
-                    <!--header-->
-                    <ProgressBar
-                        Margin="10,0,10,0"
-                        Height="25"
-                        Value="{Binding Progress}"/>
+                    <Viewbox
+                        Width="25">
+                        
+                        <SymbolIcon
+                            Foreground="{ThemeResource AccentTextFillColorTertiaryBrush}"
+                            Symbol="Clock"/>
+                    </Viewbox>
 
-                    <!--details-->
-                    <Expander
-                        HorizontalAlignment="Stretch"
-                        Grid.Row="1"
-                        MinHeight="20">
-
-                        <Expander.Header>
-                            <TextBlock
-                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                FontWeight="SemiBold"
-                                FontSize="11"
-                                Text="Подробиці виконання ..."/>
-                        </Expander.Header>
-
-                        <Expander.Content>
-                            <TextBlock
-                                TextWrapping="Wrap"
-                                Text="{Binding Text}"/>
-                        </Expander.Content>
-                    </Expander>
-                </Grid>
+                    <TextBlock 
+                        VerticalAlignment="Center"
+                        Margin="0,-1.5,0,0"
+                        FontWeight="SemiBold"
+                        Text="{Binding Delay}"
+                        FontSize="13"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+                </StackPanel>
             </Border>
+
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorDisabledBrush}"
+                HorizontalAlignment="Left"
+                Margin="5,0,0,0"
+                FontSize="11"
+                Text="{Binding SendingTime, Converter={StaticResource DateTimeToStringConverter}}"/>
         </StackPanel>
     </DataTemplate>
 
+    <!--Action templates-->
     <DataTemplate x:Key="FileActionTemplateShort">
         <Grid Margin="0,5,0,5" ToolTipService.ToolTip="{Binding PathToFile}">
             
@@ -462,6 +464,7 @@
         </Grid>
     </DataTemplate>
 
+    <!--Styles-->
     <Style x:Key="AccentDropDownButtonStyle" TargetType="controls:DropDownButton">
         <Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" />
         <Setter Property="Foreground" Value="{ThemeResource ButtonForeground}" />

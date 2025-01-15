@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Exeon.Models.Actions
 {
@@ -13,9 +15,17 @@ namespace Exeon.Models.Actions
 
         public string Uri { get; set; } = null!;
 
-        public override Task Execute()
+        public override Task<ValueTuple<bool, string>> Execute()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                Process.Start(new ProcessStartInfo { FileName = Uri, UseShellExecute = true });
+                return Task.FromResult(ValueTuple.Create(true, $"Успішно відкрито веб-сторінку за посиланням: {Uri}."));
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(ValueTuple.Create(false, ex.Message));
+            }
         }
     }
 }

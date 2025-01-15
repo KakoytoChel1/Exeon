@@ -7,6 +7,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Dispatching;
 using System.Linq;
+using Windows.Graphics.Display;
+using System;
+using System.Management;
 
 namespace Exeon
 {

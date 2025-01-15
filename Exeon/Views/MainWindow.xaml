@@ -9,7 +9,8 @@
     xmlns:pages="using:Exeon.Views.Pages"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
-    Title="Exeon">
+    Title="Exeon"
+    x:Name="mainWindow">
 
     <Grid>
         <Grid.ColumnDefinitions>

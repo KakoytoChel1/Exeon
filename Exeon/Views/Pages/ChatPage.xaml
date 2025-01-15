@@ -9,6 +9,9 @@
     xmlns:chat_models="using:Exeon.Models.Chat"
     xmlns:vm_tools="using:Exeon.ViewModels.Tools"
     xmlns:converters="using:Exeon.ViewModels.Converters"
+    xmlns:Interactions="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:Exeon.ViewModels.Behaviors"
     mc:Ignorable="d"
     Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
 
@@ -22,9 +25,10 @@
         <Grid Grid.Row="0">
 
             <ListBox
-                x:Name="ChatListBox"
+                x:Name="ChatListView"
                 Margin="0,20,0,0"
                 Background="Transparent"
+                SelectedIndex="{x:Bind ViewModel.LastSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{x:Bind ViewModel.MessageItems}"
                 ItemTemplateSelector="{StaticResource MessageTemplateSelector}">
 
@@ -40,7 +44,47 @@
                         </Setter>
                     </Style>
                 </ListBox.ItemContainerStyle>
+
+                <Interactivity:Interaction.Behaviors>
+                    <behaviors:AutoScrollBehavior/>
+                </Interactivity:Interaction.Behaviors>
             </ListBox>
+
+            <StackPanel
+                x:Name="NoMessageHint"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="0">
+
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorDisabledBrush}"
+                    FontSize="18"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiLight"
+                    MaxWidth="200"
+                    Text="Тут поки порожньо, додайте новий запит"/>
+
+                <ImageIcon
+                    Width="60"
+                    Source="../../Assets/history.png"/>
+
+                <Interactivity:Interaction.Behaviors>
+                    <Interactions:DataTriggerBehavior 
+                        Binding="{x:Bind ViewModel.MessageItems.Count, Mode=OneWay}"
+                        ComparisonCondition="GreaterThan"
+                        Value="0">
+                        <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoMessageHint, Mode=OneTime}" PropertyName="Visibility" Value="Collapsed" />
+                    </Interactions:DataTriggerBehavior>
+                    <Interactions:DataTriggerBehavior 
+                        Binding="{x:Bind ViewModel.MessageItems.Count, Mode=OneWay}"
+                        ComparisonCondition="Equal"
+                        Value="0">
+                        <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=NoMessageHint, Mode=OneTime}" PropertyName="Visibility" Value="Visible" />
+                    </Interactions:DataTriggerBehavior>
+                </Interactivity:Interaction.Behaviors>
+            </StackPanel>
         </Grid>
 
         <!--Enter message field-->
@@ -58,10 +102,12 @@
                         <ColumnDefinition Width="80"/>
                     </Grid.ColumnDefinitions>
 
+                    <!--Send command button-->
                     <Button
                         HorizontalAlignment="Center"
                         Height="30"
-                        Width="30">
+                        Width="30"
+                        Command="{x:Bind ViewModel.SendEnteredTextCommand}">
 
                         <Viewbox
                             Margin="-3,-4,-5,-4">
@@ -78,7 +124,10 @@
                         Style="{StaticResource TransparentTextBoxStyle}"
                         VerticalAlignment="Center"
                         FontSize="13"
-                        PlaceholderText="Введіть вашу команду..."/>
+                        PlaceholderText="Введіть вашу команду..."
+                        KeyDown="TextBox_KeyDown"
+                        Text="{x:Bind ViewModel.CommandTextField, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    </TextBox>
 
                     <StackPanel
                         Grid.Column="2"

@@ -20,6 +20,7 @@
     <None Remove="Assets\cross.png" />
     <None Remove="Assets\cross_fail.png" />
     <None Remove="Assets\folder.png" />
+    <None Remove="Assets\history.png" />
     <None Remove="Assets\sound.png" />
     <None Remove="Assets\SuccessIcon.png" />
     <None Remove="Assets\web.png" />
@@ -64,7 +65,9 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Management" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Dialog pages\AddNewSoundActionPage.xaml">
@@ -125,9 +128,6 @@
     <Page Update="Views\Dialog pages\AddNewCustomCommandPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Tools\" />
   </ItemGroup>
 
   <!--

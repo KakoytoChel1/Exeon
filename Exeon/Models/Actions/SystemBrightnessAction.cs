@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using Exeon.Models.Tools;
+using System;
+using System.Threading.Tasks;
 
 namespace Exeon.Models.Actions
 {
@@ -13,9 +15,17 @@ namespace Exeon.Models.Actions
 
         public int BrightnessLevel { get; set; }
 
-        public override Task Execute()
+        public override Task<ValueTuple<bool, string>> Execute()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                SystemBrightnessController.SetBrightness(BrightnessLevel); 
+                return Task.FromResult(ValueTuple.Create(true, $"Рівень яскравості встановлено на: {BrightnessLevel}%."));
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(ValueTuple.Create(false, ex.Message));
+            }
         }
     }
 }
