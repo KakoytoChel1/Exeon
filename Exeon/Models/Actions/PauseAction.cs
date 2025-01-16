@@ -14,13 +14,9 @@ namespace Exeon.Models.Actions
 
         public long DelayInSeconds { get; set; }
 
-        public override async Task<ValueTuple<bool, string>> Execute()
+        public override Task<ValueTuple<bool, string>> Execute()
         {
-            for (int i = 0; i < DelayInSeconds; i++)
-            {
-                await Task.Delay(1000);
-            }
-            return ValueTuple.Create(false, string.Empty);
+            throw new NotImplementedException();
         }
     }
 }

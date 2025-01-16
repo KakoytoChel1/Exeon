@@ -11,7 +11,6 @@
     xmlns:converters="using:Exeon.ViewModels.Converters"
     xmlns:Interactions="using:Microsoft.Xaml.Interactions.Core"
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:behaviors="using:Exeon.ViewModels.Behaviors"
     mc:Ignorable="d"
     Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
 
@@ -24,31 +23,32 @@
         <!--Chat field-->
         <Grid Grid.Row="0">
 
-            <ListBox
+            <ListView
                 x:Name="ChatListView"
                 Margin="0,20,0,0"
                 Background="Transparent"
-                SelectedIndex="{x:Bind ViewModel.LastSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{x:Bind ViewModel.MessageItems}"
                 ItemTemplateSelector="{StaticResource MessageTemplateSelector}">
 
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <Setter Property="Template">
                             <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
+                                <ControlTemplate TargetType="ListViewItem">
                                     <ContentPresenter/>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
-                </ListBox.ItemContainerStyle>
+                </ListView.ItemContainerStyle>
 
-                <Interactivity:Interaction.Behaviors>
-                    <behaviors:AutoScrollBehavior/>
-                </Interactivity:Interaction.Behaviors>
-            </ListBox>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+            </ListView>
 
             <StackPanel
                 x:Name="NoMessageHint"

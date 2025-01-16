@@ -43,14 +43,21 @@ namespace Exeon.Models.Commands
         {
             await Task.Run(async () =>
             {
-                foreach(Actions.Action action in _actions)
+                foreach (Actions.Action action in _actions)
                 {
-                    await Task.Delay(100);
+                    await Task.Delay(100); // Краткая пауза между действиями
 
-                    if(action is PauseAction pauseAction)
+                    if (action is PauseAction pauseAction)
                     {
-                        subFunc.Invoke(pauseAction);
-                        await action.Execute();
+                        var delayMessageItem = new AssistantActionDelayMessageItem
+                        {
+                            Delay = pauseAction.DelayInSeconds,
+                            SendingTime = DateTime.Now,
+                            Text = $"Пауза на {pauseAction.DelayInSeconds} секунд."
+                        };
+
+                        subFunc.Invoke(delayMessageItem);
+                        await delayMessageItem.StartDelayAsync();
                         continue;
                     }
 
@@ -60,5 +67,6 @@ namespace Exeon.Models.Commands
                 }
             });
         }
+
     }
 }

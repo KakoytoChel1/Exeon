@@ -38,14 +38,6 @@ namespace Exeon.ViewModels
             set { _commandTextField = value; OnPropertyChanged(); }
         }
 
-        // For scrolling behavior
-        // Indicates the last element of the collection
-        private int _lastSelectedIndex;
-        public int LastSelectedIndex
-        {
-            get { return _lastSelectedIndex; }
-            set { _lastSelectedIndex = value; OnPropertyChanged(); }
-        }
         #endregion
 
         #region Commands
@@ -77,7 +69,6 @@ namespace Exeon.ViewModels
         private async void SendUserMessageAndStart(string commandText)
         {
             MessageItems.Add(new UserMessageItem(commandText) { SendingTime = DateTime.Now });
-            LastSelectedIndex = MessageItems.Count - 1;
 
             CustomCommand? command = await FindRequestedCommandAsync(commandText);
 
@@ -87,10 +78,12 @@ namespace Exeon.ViewModels
             }
             else
             {
-                MessageItems.Add(new AssistantSimpleMessageItem
+                var messageItem = new AssistantMessageItem();
+                messageItem.MessageItems.Add(new AssistantSimpleMessageItem
                     ($"Не вдалось знайти команду за наступним запитом - \"{commandText}\".")
                 { SendingTime = DateTime.Now });
-                LastSelectedIndex = MessageItems.Count - 1;
+
+                MessageItems.Add(messageItem);
             }
         }
 
@@ -108,6 +101,8 @@ namespace Exeon.ViewModels
 
         private void ExecuteRequestedCommand(CustomCommand command)
         {
+            AssistantMessageItem messageItem = null!;
+
             Action<bool, string> func = (result, details) =>
             {
                 _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
@@ -115,16 +110,15 @@ namespace Exeon.ViewModels
                     if(result)
                     {
                         // If successfully completed
-                        MessageItems.Add(new AssistantActionSucceededMessageItem() 
+                        messageItem.MessageItems.Add(new AssistantActionSucceededMessageItem() 
                         {SendingTime = DateTime.Now, Text = details});
                     }
                     else
                     {
                         // If failed
-                        MessageItems.Add(new AssistantActionFailedMessageItem()
+                        messageItem.MessageItems.Add(new AssistantActionFailedMessageItem()
                         { SendingTime = DateTime.Now, Text = details });
                     }
-                    LastSelectedIndex = MessageItems.Count - 1;
                 });
             };
 
@@ -132,16 +126,18 @@ namespace Exeon.ViewModels
             {
                 _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
                 {
-                    if(obj is PauseAction pauseAction)
+                    if (obj is AssistantActionDelayMessageItem delayMessageItem)
                     {
-                        MessageItems.Add(new AssistantActionDelayMessageItem() 
-                        { Delay = pauseAction.DelayInSeconds, SendingTime = DateTime.Now});
+                        messageItem.MessageItems.Add(delayMessageItem);
+                        //await delayMessageItem.StartDelayAsync();
                     }
                 });
             };
 
-            if(command.Actions.Any())
+            if (command.Actions.Any())
             {
+                messageItem = new AssistantMessageItem();
+                MessageItems.Add(messageItem);
                 command.Execute(func, subFunc);
             }
         }
