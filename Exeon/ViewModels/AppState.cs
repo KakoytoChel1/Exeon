@@ -51,6 +51,20 @@ namespace Exeon.ViewModels
             get { return _selectedModifyingCustomCommand; }
             set { _selectedModifyingCustomCommand = value; OnPropertyChanged(); }
         }
+
+        private bool _isCommandRunning;
+        public bool IsCommandRunning
+        {
+            get { return _isCommandRunning; }
+            set { _isCommandRunning = value; OnPropertyChanged(); }
+        }
+
+        private double _commandExecutionProgress;
+        public double CommandExecutionProgress
+        {
+            get { return _commandExecutionProgress; }
+            set { _commandExecutionProgress = value; OnPropertyChanged(); }
+        }
         #endregion
 
         // Создаем копию данных, таким образом избегая tracking'а со стороны DbContext

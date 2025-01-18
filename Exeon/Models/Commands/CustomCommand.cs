@@ -3,6 +3,7 @@ using Exeon.Models.Chat;
 using Exeon.ViewModels.Tools;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Exeon.Models.Commands
@@ -39,15 +40,18 @@ namespace Exeon.Models.Commands
             }
         }
 
-        public async void Execute(Action<bool, string> func, Action<object> subFunc)
+        public async Task Execute(Action<bool, string> sendSucccesOrFailedMessage, Action<object> sendDelayMessage, 
+            Action<double> changeCommandExecutionProgressBarValue, CancellationToken cancellationToken)
         {
             await Task.Run(async () =>
             {
-                foreach (Actions.Action action in _actions)
+                for(int i = 0; i < _actions.Count; i++)
                 {
-                    await Task.Delay(100); // Краткая пауза между действиями
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    if (action is PauseAction pauseAction)
+                    await Task.Delay(100, cancellationToken);
+
+                    if (_actions[i] is PauseAction pauseAction)
                     {
                         var delayMessageItem = new AssistantActionDelayMessageItem
                         {
@@ -56,17 +60,20 @@ namespace Exeon.Models.Commands
                             Text = $"Пауза на {pauseAction.DelayInSeconds} секунд."
                         };
 
-                        subFunc.Invoke(delayMessageItem);
-                        await delayMessageItem.StartDelayAsync();
+                        sendDelayMessage.Invoke(delayMessageItem);
+                        await delayMessageItem.StartDelayAsync(cancellationToken);
+
+                        changeCommandExecutionProgressBarValue.Invoke(((i + 1) * 100) / _actions.Count);
                         continue;
                     }
 
-                    ValueTuple<bool, string> result = await action.Execute();
+                    var result = await _actions[i].Execute();
 
-                    func.Invoke(result.Item1, result.Item2);
+                    sendSucccesOrFailedMessage.Invoke(result.Item1, result.Item2);
+
+                    changeCommandExecutionProgressBarValue.Invoke(((i + 1) * 100) / _actions.Count);
                 }
-            });
+            }, cancellationToken);
         }
-
     }
 }

@@ -18,6 +18,8 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <!--Chat field-->
@@ -89,7 +91,6 @@
 
         <!--Enter message field-->
         <Grid Grid.Row="1">
-
             <Border
                 Margin="5"
                 CornerRadius="7"
@@ -104,6 +105,7 @@
 
                     <!--Send command button-->
                     <Button
+                        x:Name="SendCommandButton"
                         HorizontalAlignment="Center"
                         Height="30"
                         Width="30"
@@ -115,9 +117,25 @@
                             <SymbolIcon 
                                 Symbol="Send"/>
                         </Viewbox>
+
+                        <Interactivity:Interaction.Behaviors>
+                            <Interactions:DataTriggerBehavior 
+                                    Binding="{x:Bind ViewModel.IsEnterCommandPanelEnabled, Mode=TwoWay}"
+                                    ComparisonCondition="Equal"
+                                    Value="True">
+                                <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=SendCommandButton, Mode=OneTime}" PropertyName="IsEnabled" Value="True"/>
+                            </Interactions:DataTriggerBehavior>
+                            <Interactions:DataTriggerBehavior 
+                                    Binding="{x:Bind ViewModel.IsEnterCommandPanelEnabled, Mode=TwoWay}"
+                                    ComparisonCondition="Equal"
+                                    Value="False">
+                                <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=SendCommandButton, Mode=OneTime}" PropertyName="IsEnabled" Value="False"/>
+                            </Interactions:DataTriggerBehavior>
+                        </Interactivity:Interaction.Behaviors>
                     </Button>
 
                     <TextBox
+                        x:Name="EnterCommandTextBox"
                         TextWrapping="Wrap"
                         Grid.Column="1"
                         BorderThickness="0"
@@ -136,6 +154,7 @@
 
                         <!--lock speak button-->
                         <Button
+                            x:Name="LockSpeakButton"
                             Height="30"
                             Width="30">
 
@@ -150,20 +169,103 @@
 
                         <!--speak button-->
                         <Button
+                            x:Name="SpeakButton"
                             Style="{ThemeResource AccentButtonStyle}"
                             Height="40"
                             Width="40">
 
                             <Viewbox
                                 Margin="-1">
-                                
+
                                 <SymbolIcon Symbol="Microphone"/>
                             </Viewbox>
                         </Button>
-                        
                     </StackPanel>
                 </Grid>
             </Border>
+
+            <!--"Disables" EnterCommandPanel by covering it-->
+            <Border 
+                Margin="5"
+                CornerRadius="7"
+                Visibility="Collapsed"
+                x:Name="EnabledCoverBorder"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                Opacity="1">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="45"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!--cancel button-->
+                    <Button
+                        x:Name="CancelButton"
+                        Grid.Column="1"
+                        Height="40"
+                        Width="40"
+                        Command="{x:Bind ViewModel.CancelCommandExecutionCommand}"
+                        Style="{StaticResource CancelButtonStyle}"
+                        BorderThickness="0"
+                        ToolTipService.ToolTip="Зупинити виконання команди">
+
+                        <Viewbox
+                            Margin="1.5,2.5,0,0">
+
+                            <SymbolIcon 
+                                Foreground="{ThemeResource TextOnAccentAAFillColorPrimary}"
+                                Symbol="Cancel"/>
+                        </Viewbox>
+                    </Button>
+                </Grid>
+
+                <Interactivity:Interaction.Behaviors>
+                    <Interactions:DataTriggerBehavior 
+                            Binding="{x:Bind ViewModel.IsEnterCommandPanelEnabled, Mode=OneWay}"
+                            ComparisonCondition="Equal"
+                            Value="True">
+                        <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=EnabledCoverBorder, Mode=OneTime}" PropertyName="Visibility" Value="Collapsed"/>
+                    </Interactions:DataTriggerBehavior>
+                    <Interactions:DataTriggerBehavior 
+                            Binding="{x:Bind ViewModel.IsEnterCommandPanelEnabled, Mode=OneWay}"
+                            ComparisonCondition="Equal"
+                            Value="False">
+                        <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=EnabledCoverBorder, Mode=OneTime}" PropertyName="Visibility" Value="Visible"/>
+                    </Interactions:DataTriggerBehavior>
+                </Interactivity:Interaction.Behaviors>
+            </Border>
         </Grid>
+
+        <!--Command executing progress-->
+        <ProgressBar
+            x:Name="CommandExecutingProgressBar"
+            Visibility="Collapsed"
+            Value="{x:Bind ViewModel.AppState.CommandExecutionProgress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Grid.Row="2">
+
+            <Interactivity:Interaction.Behaviors>
+                <Interactions:DataTriggerBehavior 
+                        Binding="{x:Bind ViewModel.AppState.IsCommandRunning, Mode=OneWay}"
+                        ComparisonCondition="Equal"
+                        Value="True">
+                    <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=CommandExecutingProgressBar, Mode=OneTime}" PropertyName="Visibility" Value="Visible"/>
+                </Interactions:DataTriggerBehavior>
+                <Interactions:DataTriggerBehavior 
+                        Binding="{x:Bind ViewModel.AppState.IsCommandRunning, Mode=OneWay}"
+                        ComparisonCondition="Equal"
+                        Value="False">
+                    <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=CommandExecutingProgressBar, Mode=OneTime}" PropertyName="Visibility" Value="Collapsed"/>
+                </Interactions:DataTriggerBehavior>
+            </Interactivity:Interaction.Behaviors>
+        </ProgressBar>
+
+        <!--Speaking active indicator-->
+        <Border
+            x:Name="VoiceSpeakingIsActive"
+            Visibility="Collapsed"
+            Height="3"
+            Grid.Row="3"
+            Background="{ThemeResource AccentAAFillColorDefaultBrush}"/>
     </Grid>
 </Page>

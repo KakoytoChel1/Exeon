@@ -37,11 +37,21 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Orientation="Horizontal"
-                Spacing="5">
+                Spacing="6">
 
-                <ImageIcon
+                <!--<ImageIcon
                     Height="25"
-                    Source="../Assets/temporaryLogo.png"/>
+                    Source="../Assets/temporaryLogo.png"/>-->
+
+                <Ellipse
+                    Width="20"
+                    Height="20"
+                    Stroke="{ThemeResource AccentAAFillColorDefaultBrush}"
+                    StrokeThickness="2"
+                    Fill="Transparent"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+
 
                 <TextBlock
                     FontWeight="SemiBold"

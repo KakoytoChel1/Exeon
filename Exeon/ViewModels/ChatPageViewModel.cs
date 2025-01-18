@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using Exeon.Services;
 using Exeon.Models.Actions;
+using Microsoft.Xaml.Interactivity;
+using System.Threading;
 
 namespace Exeon.ViewModels
 {
@@ -16,6 +18,7 @@ namespace Exeon.ViewModels
     {
         private readonly INavigationService _navigationService;
         private readonly DispatcherQueueProvider _dispatcherQueueProvider;
+        private CancellationTokenSource? _cts;
         public AppState AppState { get; }
 
         public ObservableCollection<MessageItem> MessageItems { get; set; }
@@ -25,6 +28,8 @@ namespace Exeon.ViewModels
             AppState = appState;
             _navigationService = navigationService;
             _dispatcherQueueProvider = dispatcherQueueProvider;
+
+            IsEnterCommandPanelEnabled = true;
 
             MessageItems = new ObservableCollection<MessageItem>();
         }
@@ -38,6 +43,12 @@ namespace Exeon.ViewModels
             set { _commandTextField = value; OnPropertyChanged(); }
         }
 
+        private bool _IsEnterCommandPanelEnabled;
+        public bool IsEnterCommandPanelEnabled
+        {
+            get { return _IsEnterCommandPanelEnabled; }
+            set { _IsEnterCommandPanelEnabled = value; OnPropertyChanged(); }
+        }
         #endregion
 
         #region Commands
@@ -47,7 +58,7 @@ namespace Exeon.ViewModels
         {
             get
             {
-                if( _sendEnteredTextCommand == null)
+                if (_sendEnteredTextCommand == null)
                 {
                     _sendEnteredTextCommand = new RelayCommand((obj) =>
                     {
@@ -62,6 +73,28 @@ namespace Exeon.ViewModels
                 return _sendEnteredTextCommand;
             }
         }
+
+        private ICommand? _cancelCommandExecutionCommand;
+        public ICommand CancelCommandExecutionCommand
+        {
+            get
+            {
+                if(_cancelCommandExecutionCommand == null)
+                {
+                    _cancelCommandExecutionCommand = new RelayCommand((obj) =>
+                    {
+                        if(_cts != null)
+                        {
+                            _cts.Cancel();
+                            AppState.IsCommandRunning = false;
+                            IsEnterCommandPanelEnabled = true;
+                            AppState.CommandExecutionProgress = 0;
+                        }
+                    });
+                }
+                return _cancelCommandExecutionCommand;
+            }
+        }
         #endregion
 
         #region Methods
@@ -74,6 +107,8 @@ namespace Exeon.ViewModels
 
             if (command != null)
             {
+                AppState.IsCommandRunning = true;
+                IsEnterCommandPanelEnabled = false;
                 ExecuteRequestedCommand(command);
             }
             else
@@ -99,19 +134,20 @@ namespace Exeon.ViewModels
             return command;
         }
 
-        private void ExecuteRequestedCommand(CustomCommand command)
+        private async void ExecuteRequestedCommand(CustomCommand command)
         {
             AssistantMessageItem messageItem = null!;
+            _cts = new CancellationTokenSource();
 
-            Action<bool, string> func = (result, details) =>
+            Action<bool, string> sendSucccesOrFailedMessage = (result, details) =>
             {
                 _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
                 {
-                    if(result)
+                    if (result)
                     {
                         // If successfully completed
-                        messageItem.MessageItems.Add(new AssistantActionSucceededMessageItem() 
-                        {SendingTime = DateTime.Now, Text = details});
+                        messageItem.MessageItems.Add(new AssistantActionSucceededMessageItem()
+                        { SendingTime = DateTime.Now, Text = details });
                     }
                     else
                     {
@@ -122,23 +158,45 @@ namespace Exeon.ViewModels
                 });
             };
 
-            Action<object> subFunc = (obj) =>
+            Action<object> sendDelayMessage = (obj) =>
             {
                 _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
                 {
                     if (obj is AssistantActionDelayMessageItem delayMessageItem)
                     {
                         messageItem.MessageItems.Add(delayMessageItem);
-                        //await delayMessageItem.StartDelayAsync();
                     }
+                });
+            };
+
+            Action<double> changeCommandExecutionProgressBarValue = (value) =>
+            {
+                _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
+                {
+                    AppState.CommandExecutionProgress = value;
                 });
             };
 
             if (command.Actions.Any())
             {
-                messageItem = new AssistantMessageItem();
+                messageItem = new AssistantMessageItem() { SendingTime = DateTime.Now };
                 MessageItems.Add(messageItem);
-                command.Execute(func, subFunc);
+
+                try
+                {
+                    await command.Execute(sendSucccesOrFailedMessage, sendDelayMessage, changeCommandExecutionProgressBarValue, _cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    messageItem.MessageItems.Add(new AssistantActionFailedMessageItem()
+                    { SendingTime = DateTime.Now, Text = "Виконання команди було скасовано." });
+                }
+                finally
+                {
+                    AppState.IsCommandRunning = false;
+                    IsEnterCommandPanelEnabled = true;
+                    AppState.CommandExecutionProgress = 0;
+                }
             }
         }
         #endregion

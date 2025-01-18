@@ -1,5 +1,6 @@
 ﻿using Exeon.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Exeon.Models.Chat
@@ -15,7 +16,7 @@ namespace Exeon.Models.Chat
 
         public long Delay { get; set; }
 
-        public async Task StartDelayAsync()
+        public async Task StartDelayAsync(CancellationToken cancellationToken)
         {
             var dispatcher = App.Services.GetRequiredService<DispatcherQueueProvider>().DispatcherQueue;
 
@@ -23,6 +24,8 @@ namespace Exeon.Models.Chat
             {
                 for (long i = 0; i <= Delay; i++)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     dispatcher.TryEnqueue(() =>
                     {
                         Progress = (i * 100) / Delay;
