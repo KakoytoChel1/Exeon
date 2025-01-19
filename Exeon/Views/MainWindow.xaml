@@ -57,7 +57,7 @@
                     FontWeight="SemiBold"
                     VerticalAlignment="Center"
                     FontSize="12"
-                    Text="Exeon"/>
+                    Text="Exeon - 1.0 beta"/>
             </StackPanel>
         </Border>
 

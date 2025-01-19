@@ -68,6 +68,7 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Management" Version="9.0.1" />
+    <PackageReference Include="Vosk" Version="0.3.38" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Dialog pages\AddNewSoundActionPage.xaml">

@@ -7,6 +7,9 @@ namespace Exeon.Models.Chat
     {
         public int Id { get; set; }
         public string Text { get; set; } = null!;
-        public DateTime SendingTime { get; set; }
+        public DateTime SendingTime
+        {
+            get { return DateTime.Now; }
+        }
     }
 }

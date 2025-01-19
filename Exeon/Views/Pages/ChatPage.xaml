@@ -172,7 +172,8 @@
                             x:Name="SpeakButton"
                             Style="{ThemeResource AccentButtonStyle}"
                             Height="40"
-                            Width="40">
+                            Width="40"
+                            Command="{x:Bind ViewModel.StartListenCommand}">
 
                             <Viewbox
                                 Margin="-1">
@@ -266,6 +267,22 @@
             Visibility="Collapsed"
             Height="3"
             Grid.Row="3"
-            Background="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+            Background="{ThemeResource AccentAAFillColorDefaultBrush}">
+
+            <Interactivity:Interaction.Behaviors>
+                <Interactions:DataTriggerBehavior 
+                        Binding="{x:Bind ViewModel.AppState.IsListening, Mode=OneWay}"
+                        ComparisonCondition="Equal"
+                        Value="True">
+                    <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=VoiceSpeakingIsActive, Mode=OneTime}" PropertyName="Visibility" Value="Visible"/>
+                </Interactions:DataTriggerBehavior>
+                <Interactions:DataTriggerBehavior 
+                        Binding="{x:Bind ViewModel.AppState.IsListening, Mode=OneWay}"
+                        ComparisonCondition="Equal"
+                        Value="False">
+                    <Interactions:ChangePropertyAction TargetObject="{Binding ElementName=VoiceSpeakingIsActive, Mode=OneTime}" PropertyName="Visibility" Value="Collapsed"/>
+                </Interactions:DataTriggerBehavior>
+            </Interactivity:Interaction.Behaviors>
+        </Border>
     </Grid>
 </Page>

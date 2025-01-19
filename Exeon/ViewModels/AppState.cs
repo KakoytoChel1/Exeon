@@ -65,6 +65,13 @@ namespace Exeon.ViewModels
             get { return _commandExecutionProgress; }
             set { _commandExecutionProgress = value; OnPropertyChanged(); }
         }
+
+        private bool _isListening = false;
+        public bool IsListening
+        {
+            get { return _isListening; }
+            set { _isListening = value; OnPropertyChanged(); }
+        }
         #endregion
 
         // Создаем копию данных, таким образом избегая tracking'а со стороны DbContext

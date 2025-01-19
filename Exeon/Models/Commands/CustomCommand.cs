@@ -56,7 +56,6 @@ namespace Exeon.Models.Commands
                         var delayMessageItem = new AssistantActionDelayMessageItem
                         {
                             Delay = pauseAction.DelayInSeconds,
-                            SendingTime = DateTime.Now,
                             Text = $"Пауза на {pauseAction.DelayInSeconds} секунд."
                         };
 

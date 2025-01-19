@@ -8,30 +8,66 @@ using Exeon.Models.Commands;
 using System.Threading.Tasks;
 using System.Linq;
 using Exeon.Services;
-using Exeon.Models.Actions;
-using Microsoft.Xaml.Interactivity;
 using System.Threading;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Exeon.ViewModels
 {
     public class ChatPageViewModel : ObservableObject
     {
         private readonly INavigationService _navigationService;
+        private readonly ISpeechRecognitionService _speechRecognitionService;
         private readonly DispatcherQueueProvider _dispatcherQueueProvider;
         private CancellationTokenSource? _cts;
         public AppState AppState { get; }
 
         public ObservableCollection<MessageItem> MessageItems { get; set; }
 
-        public ChatPageViewModel(INavigationService navigationService, AppState appState, DispatcherQueueProvider dispatcherQueueProvider)
+        public ChatPageViewModel(INavigationService navigationService, 
+            AppState appState, DispatcherQueueProvider dispatcherQueueProvider, ISpeechRecognitionService speechRecognitionService)
         {
             AppState = appState;
             _navigationService = navigationService;
             _dispatcherQueueProvider = dispatcherQueueProvider;
+            _speechRecognitionService = speechRecognitionService;
+
+            _speechRecognitionService.FinalRecognition += _speechRecognitionService_FinalRecognition;
+            _speechRecognitionService.PartialRecognition += _speechRecognitionService_PartialRecognition;
 
             IsEnterCommandPanelEnabled = true;
 
             MessageItems = new ObservableCollection<MessageItem>();
+        }
+
+        private void _speechRecognitionService_PartialRecognition(object? sender, string result)
+        {
+            _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
+            {
+                Dictionary<string, string>? value = JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
+
+                if(value != null)
+                {
+                    CommandTextField = value["partial"];
+                }
+            });
+        }
+
+        private void _speechRecognitionService_FinalRecognition(object? sender, string result)
+        {
+            _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(async () =>
+            {
+                Dictionary<string, string>? value = JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
+
+                if (value != null)
+                {
+                    CommandTextField = value["text"];
+
+                    SendAndExecuteUserCommand(CommandTextField);
+                    _speechRecognitionService.StopRecognition();
+                    AppState.IsListening = false;
+                }
+            });
         }
 
         #region Properties
@@ -62,11 +98,12 @@ namespace Exeon.ViewModels
                 {
                     _sendEnteredTextCommand = new RelayCommand((obj) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(CommandTextField))
+                        // dont send command when: it is null or listening is active
+                        if (!string.IsNullOrWhiteSpace(CommandTextField) && !AppState.IsListening)
                         {
                             var commandText = CommandTextField;
                             CommandTextField = string.Empty;
-                            SendUserMessageAndStart(commandText);
+                            SendAndExecuteUserCommand(commandText);
                         }
                     });
                 }
@@ -95,13 +132,46 @@ namespace Exeon.ViewModels
                 return _cancelCommandExecutionCommand;
             }
         }
+
+        private ICommand? _startListenCommand;
+        public ICommand StartListenCommand
+        {
+            get
+            {
+                if( _startListenCommand == null)
+                {
+                    _startListenCommand = new RelayCommand(async (obj) =>
+                    {
+                        _cts = new CancellationTokenSource();
+
+                        if (!AppState.IsListening)
+                        {
+                            await Task.Run(() =>
+                            {
+                                _speechRecognitionService.StartRecognitionAsync(_cts.Token);
+                            });
+
+                            await Task.Delay(500);
+                            AppState.IsListening = true;
+                        }
+                        else
+                        {
+                            AppState.IsListening = false;
+                            _cts?.Cancel();
+                            _speechRecognitionService.StopRecognition();
+                        }
+                    });
+                }
+                return _startListenCommand;
+            }
+        }
         #endregion
 
         #region Methods
 
-        private async void SendUserMessageAndStart(string commandText)
+        private async void SendAndExecuteUserCommand(string commandText)
         {
-            MessageItems.Add(new UserMessageItem(commandText) { SendingTime = DateTime.Now });
+            MessageItems.Add(new UserMessageItem(commandText));
 
             CustomCommand? command = await FindRequestedCommandAsync(commandText);
 
@@ -115,10 +185,10 @@ namespace Exeon.ViewModels
             {
                 var messageItem = new AssistantMessageItem();
                 messageItem.MessageItems.Add(new AssistantSimpleMessageItem
-                    ($"Не вдалось знайти команду за наступним запитом - \"{commandText}\".")
-                { SendingTime = DateTime.Now });
+                    ($"Не вдалось знайти команду за наступним запитом - \"{commandText}\"."));
 
                 MessageItems.Add(messageItem);
+                CommandTextField = string.Empty;
             }
         }
 
@@ -146,14 +216,12 @@ namespace Exeon.ViewModels
                     if (result)
                     {
                         // If successfully completed
-                        messageItem.MessageItems.Add(new AssistantActionSucceededMessageItem()
-                        { SendingTime = DateTime.Now, Text = details });
+                        messageItem.MessageItems.Add(new AssistantActionSucceededMessageItem() { Text = details});
                     }
                     else
                     {
                         // If failed
-                        messageItem.MessageItems.Add(new AssistantActionFailedMessageItem()
-                        { SendingTime = DateTime.Now, Text = details });
+                        messageItem.MessageItems.Add(new AssistantActionFailedMessageItem() { Text = details });
                     }
                 });
             };
@@ -179,7 +247,7 @@ namespace Exeon.ViewModels
 
             if (command.Actions.Any())
             {
-                messageItem = new AssistantMessageItem() { SendingTime = DateTime.Now };
+                messageItem = new AssistantMessageItem();
                 MessageItems.Add(messageItem);
 
                 try
@@ -189,13 +257,14 @@ namespace Exeon.ViewModels
                 catch (OperationCanceledException)
                 {
                     messageItem.MessageItems.Add(new AssistantActionFailedMessageItem()
-                    { SendingTime = DateTime.Now, Text = "Виконання команди було скасовано." });
+                    { Text = "Виконання команди було скасовано." });
                 }
                 finally
                 {
                     AppState.IsCommandRunning = false;
                     IsEnterCommandPanelEnabled = true;
                     AppState.CommandExecutionProgress = 0;
+                    CommandTextField =  string.Empty;
                 }
             }
         }
