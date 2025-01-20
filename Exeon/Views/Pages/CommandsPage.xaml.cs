@@ -6,11 +6,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Exeon.Views.Pages
 {
     public sealed partial class CommandsPage : Page
     {
+        private const string _noResultsTitle = "Немає результату";
+
         public CommandsPageViewModel ViewModel { get; private set; }
 
         public CommandsPage()
@@ -56,5 +59,51 @@ namespace Exeon.Views.Pages
 
             ViewModel.ModifyCustomCommand.Execute(button!.DataContext as CustomCommand);
         }
+
+        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                var suitableItems = new List<AutoSuggestCommandItem>();
+                var splitText = sender.Text.ToLower().Split(" ");
+
+                foreach (var command in ViewModel.AppState.CustomCommands)
+                {
+                    var found = splitText.All(key =>
+                        command.Command.ToLower().Contains(key));
+
+                    if (found)
+                    {
+                        suitableItems.Add(new AutoSuggestCommandItem
+                        {
+                            CustomCommand = command,
+                            Title = command.Command
+                        });
+                    }
+                }
+
+                if (suitableItems.Count == 0)
+                {
+                    suitableItems.Add(new AutoSuggestCommandItem { Title = _noResultsTitle });
+                }
+
+                sender.ItemsSource = suitableItems;
+            }
+        }
+
+        private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            if (args.SelectedItem is AutoSuggestCommandItem selectedItem)
+            {
+                if (selectedItem.Title == _noResultsTitle && selectedItem.CustomCommand == null)
+                {
+                    sender.Text = string.Empty;
+                    return;
+                }
+
+                CustomCommandsList.ScrollIntoView(selectedItem.CustomCommand);
+            }
+        }
+
     }
 }

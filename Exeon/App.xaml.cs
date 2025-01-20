@@ -56,7 +56,7 @@ namespace Exeon
             serviceCollection.AddSingleton<IConfigurationService, ConfigurationService>();
             serviceCollection.AddSingleton<DispatcherQueueProvider>(); // Initializing in MainWindow's code behind (MainWindow.xaml.cs)
             serviceCollection.AddSingleton<ISpeechRecognitionService>(provider =>
-                new SpeechRecognitionService(@"C:\Users\KakoytoChel228\Desktop\vosk-model-uk-v3"));
+                new SpeechRecognitionService(@"C:\Users\KakoytoChel228\Desktop\speech-ua-model"));
 
             Services = serviceCollection.BuildServiceProvider();
 

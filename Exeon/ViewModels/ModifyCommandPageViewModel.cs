@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Action = Exeon.Models.Actions.Action;
 using System.Threading.Tasks;
 using Exeon.Services;
+using System.Text.RegularExpressions;
 
 namespace Exeon.ViewModels
 {
@@ -99,12 +100,24 @@ namespace Exeon.ViewModels
             {
                 if (_saveChanges == null)
                 {
-                    _saveChanges = new RelayCommand((obj) =>
-                    {
-                        AppState.ApplicationContext.SaveChanges();
+                    _saveChanges = new RelayCommand(async (obj) =>
+                    { 
+                        var correctCommandText = Regex.Replace(AppState.SelectedModifyingCustomCommand!.Command.Trim(), @"\s{2,}", " ");
 
-                        AppState.IsSidePanelButtonsEnabled = true;
-                        _navigationService.GoBack();
+                        if(await AppState.CanModifyCustomCommand(AppState.SelectedModifyingCustomCommand!.Id, correctCommandText.ToLower()))
+                        {
+                            AppState.SelectedModifyingCustomCommand!.Command = correctCommandText;
+                            AppState.ApplicationContext.SaveChanges();
+
+                            AppState.IsSidePanelButtonsEnabled = true;
+                            _navigationService.GoBack();
+                        }
+                        else
+                        {
+                            var xamlRoot = App.MainWindow.Content.XamlRoot;
+                            await DialogManager.ShowContentDialog(xamlRoot, "Операцію скасовано", "ОК", ContentDialogButton.Primary,
+                                $"Неможливо зберегти нову назву '{correctCommandText}' команди, оскільки вона вже зайнята.");
+                        }
                     });
                 }
                 return _saveChanges;
@@ -332,7 +345,9 @@ namespace Exeon.ViewModels
                                     action.OrderIndex = index++;
                                 }
 
-                                AppState.ApplicationContext.UpdateRange(selectedCommand.Actions);
+                                var existingActions = selectedCommand.Actions.Where(a => a.Id != 0).ToList();
+
+                                AppState.ApplicationContext.UpdateRange(existingActions);
                             }
                         });
                     });

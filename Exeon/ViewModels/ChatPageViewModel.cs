@@ -11,6 +11,7 @@ using Exeon.Services;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Exeon.ViewModels
 {
@@ -55,7 +56,7 @@ namespace Exeon.ViewModels
 
         private void _speechRecognitionService_FinalRecognition(object? sender, string result)
         {
-            _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(async () =>
+            _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
             {
                 Dictionary<string, string>? value = JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
 
@@ -99,13 +100,13 @@ namespace Exeon.ViewModels
                     _sendEnteredTextCommand = new RelayCommand((obj) =>
                     {
                         // dont send command when: it is null or listening is active
-                        if (!string.IsNullOrWhiteSpace(CommandTextField) && !AppState.IsListening)
+                        if (!string.IsNullOrWhiteSpace(CommandTextField))
                         {
                             var commandText = CommandTextField;
                             CommandTextField = string.Empty;
                             SendAndExecuteUserCommand(commandText);
                         }
-                    });
+                    }, (p) => !AppState.IsListening);
                 }
                 return _sendEnteredTextCommand;
             }
@@ -163,6 +164,33 @@ namespace Exeon.ViewModels
                     });
                 }
                 return _startListenCommand;
+            }
+        }
+
+        private ICommand? _cleanUpMessagesHistoryCommand;
+        public ICommand CleanUpMessagesHistoryCommand
+        {
+            get
+            {
+                if(_cleanUpMessagesHistoryCommand == null)
+                {
+                    _cleanUpMessagesHistoryCommand = new RelayCommand(async (obj) =>
+                    {
+                        if(!AppState.IsCommandRunning && !AppState.IsListening && MessageItems.Any())
+                        {
+                            var xamlRoot = App.MainWindow.Content.XamlRoot;
+
+                            var result = await DialogManager.ShowContentDialog(xamlRoot, "Очищення чату", "Очистити",
+                                ContentDialogButton.Primary, "Ви дійсно бажаєте очистити історію всіх відправлених команд?", closeBtnText: "Скасувати");
+
+                            if (result == ContentDialogResult.Primary)
+                            {
+                                MessageItems.Clear();
+                            }
+                        }
+                    });
+                }
+                return _cleanUpMessagesHistoryCommand;
             }
         }
         #endregion

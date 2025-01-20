@@ -3,6 +3,7 @@ using Exeon.Models.Chat;
 using Exeon.ViewModels.Tools;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,6 +18,7 @@ namespace Exeon.Models.Commands
             Command = command;
         }
 
+        [Key]
         public int Id { get; set; }
 
         private string _command = null!;

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Action = Exeon.Models.Actions.Action;
 
 namespace Exeon.ViewModels
@@ -86,6 +87,36 @@ namespace Exeon.ViewModels
                 SystemSoundAction soundAction => new SystemSoundAction(soundAction.SoundLevel) { Id = soundAction.Id },
                 _ => throw new NotSupportedException($"Unsupported action type: {action.GetType().Name}")
             };
+        }
+
+        public async Task<bool> CanAddNewCustomCommand(string commandText)
+        {
+            bool result = true;
+
+            await Task.Run(() =>
+            {
+                var command = CustomCommands.FirstOrDefault(com => com.Command.ToLower() == commandText);
+
+                if (command != null)
+                    result = false;
+            });
+
+            return result;
+        }
+
+        public async Task<bool> CanModifyCustomCommand(int id, string commandText)
+        {
+            bool result = true;
+
+            await Task.Run(() =>
+            {
+                var command = CustomCommands.FirstOrDefault(com => com.Id != id && com.Command.ToLower() == commandText);
+
+                if (command != null)
+                    result = false;
+            });
+
+            return result;
         }
     }
 }

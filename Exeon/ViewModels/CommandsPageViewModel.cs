@@ -7,6 +7,8 @@ using Exeon.Views.Pages;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Exeon.ViewModels
@@ -53,13 +55,26 @@ namespace Exeon.ViewModels
                         // If was pressed primary button - adding new custom command
                         if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(NewCustomCommandCommandText))
                         {
-                            var newCommand = new CustomCommand(NewCustomCommandCommandText);
-                            AppState.CustomCommands.Add(newCommand);
+                            // Trimming and replacing 2 and more spaces with 1
+                            string newCustomCommandtext = Regex.Replace(NewCustomCommandCommandText.Trim(), @"\s{2,}", " ");
 
-                            AppState.ApplicationContext.Add(newCommand);
-                            AppState.ApplicationContext.SaveChanges();
+                            if (await AppState.CanAddNewCustomCommand(newCustomCommandtext.ToLower()))
+                            {
+                                var newCommand = new CustomCommand(newCustomCommandtext);
+                                AppState.CustomCommands.Add(newCommand);
 
-                            NewCustomCommandCommandText = string.Empty;
+                                AppState.ApplicationContext.Add(newCommand);
+                                AppState.ApplicationContext.SaveChanges();
+
+                                NewCustomCommandCommandText = string.Empty;
+                            }
+                            else
+                            {
+                                await DialogManager.ShowContentDialog(xamlRoot, "Операцію скасовано", "ОК", ContentDialogButton.Primary,
+                                    $"Неможливо створити нову команду з назвою '{newCustomCommandtext}', оскільки вона вже зайнята.");
+
+                                NewCustomCommandCommandText = string.Empty;
+                            }
                         }
                     });
                 }
@@ -127,8 +142,7 @@ namespace Exeon.ViewModels
         }
         #endregion
 
-
-        public void StartEditingCommand(CustomCommand commandToEdit)
+        private void StartEditingCommand(CustomCommand commandToEdit)
         {
             if (commandToEdit != null)
             {

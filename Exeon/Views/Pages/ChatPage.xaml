@@ -109,6 +109,7 @@
                         HorizontalAlignment="Center"
                         Height="30"
                         Width="30"
+                        ToolTipService.ToolTip="Відправити команду"
                         Command="{x:Bind ViewModel.SendEnteredTextCommand}">
 
                         <Viewbox
@@ -152,18 +153,20 @@
                         Orientation="Horizontal"
                         Spacing="5">
 
-                        <!--lock speak button-->
+                        <!--clean message history button-->
                         <Button
-                            x:Name="LockSpeakButton"
+                            x:Name="CleanMessageHistoryButton"
                             Height="30"
-                            Width="30">
+                            Width="30"
+                            ToolTipService.ToolTip="Очистити чат"
+                            Command="{x:Bind ViewModel.CleanUpMessagesHistoryCommand}">
 
                             <Viewbox
                                 Margin="-4">
 
                                 <FontIcon
                                     FontFamily="Segoe MDL2 Assets" 
-                                    Glyph="&#xE72E;"/>
+                                    Glyph="&#xEA99;"/>
                             </Viewbox>
                         </Button>
 
@@ -173,6 +176,7 @@
                             Style="{ThemeResource AccentButtonStyle}"
                             Height="40"
                             Width="40"
+                            ToolTipService.ToolTip="Голосове введення"
                             Command="{x:Bind ViewModel.StartListenCommand}">
 
                             <Viewbox
