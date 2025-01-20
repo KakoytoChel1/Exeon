@@ -64,9 +64,11 @@ namespace Exeon.ViewModels
                 {
                     CommandTextField = value["text"];
 
-                    SendAndExecuteUserCommand(CommandTextField);
+                    _cts?.Cancel();
                     _speechRecognitionService.StopRecognition();
                     AppState.IsListening = false;
+
+                    SendAndExecuteUserCommand(CommandTextField);
                 }
             });
         }
@@ -106,7 +108,7 @@ namespace Exeon.ViewModels
                             CommandTextField = string.Empty;
                             SendAndExecuteUserCommand(commandText);
                         }
-                    }, (p) => !AppState.IsListening);
+                    }, (p) => !AppState.IsListening && !AppState.IsCommandRunning);
                 }
                 return _sendEnteredTextCommand;
             }
@@ -145,25 +147,36 @@ namespace Exeon.ViewModels
                     {
                         _cts = new CancellationTokenSource();
 
-                        if (!AppState.IsListening)
+                        await Task.Run(() =>
                         {
-                            await Task.Run(() =>
-                            {
-                                _speechRecognitionService.StartRecognitionAsync(_cts.Token);
-                            });
+                            _speechRecognitionService.StartRecognitionAsync(_cts.Token);
+                        });
 
-                            await Task.Delay(500);
-                            AppState.IsListening = true;
-                        }
-                        else
-                        {
-                            AppState.IsListening = false;
-                            _cts?.Cancel();
-                            _speechRecognitionService.StopRecognition();
-                        }
-                    });
+                        await Task.Delay(100);
+                        AppState.IsListening = true;
+
+                    }, (obj) => !AppState.IsListening);
                 }
                 return _startListenCommand;
+            }
+        }
+
+        private ICommand? _stopListenCommand;
+        public ICommand StopListenCommand
+        {
+            get
+            {
+                if(_stopListenCommand == null)
+                {
+                    _stopListenCommand = new RelayCommand((obg) =>
+                    {
+                        AppState.IsListening = false;
+                        _cts?.Cancel();
+                        _speechRecognitionService.StopRecognition();
+
+                    });
+                }
+                return _stopListenCommand;
             }
         }
 

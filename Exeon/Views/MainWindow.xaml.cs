@@ -7,9 +7,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Dispatching;
 using System.Linq;
-using Windows.Graphics.Display;
 using System;
-using System.Management;
+using Microsoft.UI;
 
 namespace Exeon
 {
@@ -27,6 +26,10 @@ namespace Exeon
             var coreTitleBar = AppWindow.TitleBar;
             coreTitleBar.PreferredHeightOption = Microsoft.UI.Windowing.TitleBarHeightOption.Tall;
 
+            // To avoid a bug when hover and foreground color of the titlebar's buttons don't change when the system theme changes
+            UpdateTitleBarTheme();
+            this.Activated += MainWindow_Activated;
+
             App.Services.GetRequiredService<DispatcherQueueProvider>().Initialize(DispatcherQueue.GetForCurrentThread());
             ViewModel = App.Services.GetRequiredService<MainViewModel>();
 
@@ -39,6 +42,11 @@ namespace Exeon
             MainNavigationView.SelectionChanged += MainNavigationView_SelectionChanged;
         }
 
+        private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
+        {
+            UpdateTitleBarTheme();
+        }
+
         private void MainNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (args.SelectedItem is NavigationViewItem selectedItem)
@@ -47,6 +55,27 @@ namespace Exeon
                 {
                     ViewModel.NavigatePageCommand.Execute(pageTag);
                 }
+            }
+        }
+
+        private void UpdateTitleBarTheme()
+        {
+            var theme = Application.Current.RequestedTheme;
+            var coreTitleBar = AppWindow.TitleBar;
+
+            if (theme == ApplicationTheme.Light)
+            {
+                coreTitleBar.ButtonForegroundColor = Colors.Black;
+                coreTitleBar.ButtonBackgroundColor = Colors.Transparent;
+                coreTitleBar.ButtonHoverForegroundColor = Colors.Black;
+                coreTitleBar.ButtonHoverBackgroundColor = ColorHelper.FromArgb(255, 241, 241, 241);
+            }
+            else // Dark Theme
+            {
+                coreTitleBar.ButtonForegroundColor = Colors.White;
+                coreTitleBar.ButtonBackgroundColor = Colors.Transparent;
+                coreTitleBar.ButtonHoverForegroundColor = Colors.White;
+                coreTitleBar.ButtonHoverBackgroundColor = ColorHelper.FromArgb(255, 60, 60, 60);
             }
         }
     }
