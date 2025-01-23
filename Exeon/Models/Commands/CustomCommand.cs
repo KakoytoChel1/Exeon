@@ -29,7 +29,7 @@ namespace Exeon.Models.Commands
         }
 
         private ObservableCollection<Actions.Action> _actions = new ObservableCollection<Actions.Action>();
-        public virtual ObservableCollection<Actions.Action> Actions
+        public ObservableCollection<Actions.Action> Actions
         {
             get { return _actions; }
             set

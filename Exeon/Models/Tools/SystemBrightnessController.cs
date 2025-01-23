@@ -1,8 +1,5 @@
-﻿using Exeon.Services;
-using Microsoft.Extensions.DependencyInjection;
-using System.Management;
+﻿using System.Management;
 using System;
-using Windows.Graphics.Display;
 
 namespace Exeon.Models.Tools
 {

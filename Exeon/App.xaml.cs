@@ -3,13 +3,12 @@ using Exeon.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System;
-using Size = System.Drawing.Size;
-using Point = System.Drawing.Point;
 using Exeon.Services.IServices;
 using Exeon.Services;
 using Microsoft.UI.Xaml.Controls;
-using Exeon.Views.Pages;
 using Exeon.ViewModels.Tools;
+using Size = System.Drawing.Size;
+using Point = System.Drawing.Point;
 
 namespace Exeon
 {
