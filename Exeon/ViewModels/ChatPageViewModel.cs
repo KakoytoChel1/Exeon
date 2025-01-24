@@ -212,15 +212,30 @@ namespace Exeon.ViewModels
 
         private async void SendAndExecuteUserCommand(string commandText)
         {
+            if (string.IsNullOrEmpty(commandText))
+                return;
+
             MessageItems.Add(new UserMessageItem(commandText));
 
             CustomCommand? command = await FindRequestedCommandAsync(commandText);
 
             if (command != null)
             {
-                AppState.IsCommandRunning = true;
-                IsEnterCommandPanelEnabled = false;
-                ExecuteRequestedCommand(command);
+                if (command.Actions.Any())
+                {
+                    AppState.IsCommandRunning = true;
+                    IsEnterCommandPanelEnabled = false;
+                    ExecuteRequestedCommand(command);
+                }
+                else
+                {
+                    var messageItem = new AssistantMessageItem();
+                    messageItem.MessageItems.Add(new AssistantSimpleMessageItem
+                        ($"Виконання команди - \"{commandText}\" скасовано, у команді відсутні дії."));
+
+                    MessageItems.Add(messageItem);
+                    CommandTextField = string.Empty;
+                }
             }
             else
             {
