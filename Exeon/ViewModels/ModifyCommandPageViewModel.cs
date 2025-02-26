@@ -15,17 +15,12 @@ using System.Text.RegularExpressions;
 
 namespace Exeon.ViewModels
 {
-    public class ModifyCommandPageViewModel : ObservableObject
+    public class ModifyCommandPageViewModel : ViewModelBase
     {
-        private readonly INavigationService _navigationService;
-        private readonly DispatcherQueueProvider _dispatcherQueueProvider;
-        public AppState AppState { get; }
-
-        public ModifyCommandPageViewModel(INavigationService navigationService, AppState appState, DispatcherQueueProvider dispatcherQueueProvider)
+        public ModifyCommandPageViewModel(AppState appState, DispatcherQueueProvider dispatcherQueueProvider, INavigationService navigationService,
+            IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
+            : base(appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
         {
-            _navigationService = navigationService;
-            AppState = appState;
-            _dispatcherQueueProvider = dispatcherQueueProvider;
         }
 
         #region Properties
@@ -86,7 +81,7 @@ namespace Exeon.ViewModels
                         }
 
                         AppState.IsSidePanelButtonsEnabled = true;
-                        _navigationService.GoBack();
+                        NavigationService.GoBack();
                     });
                 }
                 return _cancelModifyingCommand;
@@ -110,7 +105,7 @@ namespace Exeon.ViewModels
                             AppState.ApplicationContext.SaveChanges();
 
                             AppState.IsSidePanelButtonsEnabled = true;
-                            _navigationService.GoBack();
+                            NavigationService.GoBack();
                         }
                         else
                         {

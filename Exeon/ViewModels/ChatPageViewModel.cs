@@ -15,26 +15,18 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Exeon.ViewModels
 {
-    public class ChatPageViewModel : ObservableObject
+    public class ChatPageViewModel : ViewModelBase
     {
-        private readonly INavigationService _navigationService;
-        private readonly ISpeechRecognitionService _speechRecognitionService;
-        private readonly DispatcherQueueProvider _dispatcherQueueProvider;
         private CancellationTokenSource? _cts;
-        public AppState AppState { get; }
 
         public ObservableCollection<MessageItem> MessageItems { get; set; }
 
-        public ChatPageViewModel(INavigationService navigationService, 
-            AppState appState, DispatcherQueueProvider dispatcherQueueProvider, ISpeechRecognitionService speechRecognitionService)
+        public ChatPageViewModel(AppState appState, DispatcherQueueProvider dispatcherQueueProvider, INavigationService navigationService,
+            IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
+            : base(appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
         {
-            AppState = appState;
-            _navigationService = navigationService;
-            _dispatcherQueueProvider = dispatcherQueueProvider;
-            _speechRecognitionService = speechRecognitionService;
-
-            _speechRecognitionService.FinalRecognition += _speechRecognitionService_FinalRecognition;
-            _speechRecognitionService.PartialRecognition += _speechRecognitionService_PartialRecognition;
+            SpeechRecognitionService.FinalRecognition += _speechRecognitionService_FinalRecognition;
+            SpeechRecognitionService.PartialRecognition += _speechRecognitionService_PartialRecognition;
 
             IsEnterCommandPanelEnabled = true;
 
@@ -43,7 +35,7 @@ namespace Exeon.ViewModels
 
         private void _speechRecognitionService_PartialRecognition(object? sender, string result)
         {
-            _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
+            DispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
             {
                 Dictionary<string, string>? value = JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
 
@@ -56,7 +48,7 @@ namespace Exeon.ViewModels
 
         private void _speechRecognitionService_FinalRecognition(object? sender, string result)
         {
-            _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
+            DispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
             {
                 Dictionary<string, string>? value = JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
 
@@ -65,7 +57,7 @@ namespace Exeon.ViewModels
                     CommandTextField = value["text"];
 
                     _cts?.Cancel();
-                    _speechRecognitionService.StopRecognition();
+                    SpeechRecognitionService.StopRecognition();
                     AppState.IsListening = false;
 
                     SendAndExecuteUserCommand(CommandTextField);
@@ -149,7 +141,7 @@ namespace Exeon.ViewModels
 
                         await Task.Run(() =>
                         {
-                            _speechRecognitionService.StartRecognitionAsync(_cts.Token);
+                            SpeechRecognitionService.StartRecognitionAsync(_cts.Token);
                         });
 
                         await Task.Delay(100);
@@ -172,7 +164,7 @@ namespace Exeon.ViewModels
                     {
                         AppState.IsListening = false;
                         _cts?.Cancel();
-                        _speechRecognitionService.StopRecognition();
+                        SpeechRecognitionService.StopRecognition();
 
                     });
                 }
@@ -267,7 +259,7 @@ namespace Exeon.ViewModels
 
             Action<bool, string> sendSucccesOrFailedMessage = (result, details) =>
             {
-                _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
+                DispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
                 {
                     if (result)
                     {
@@ -284,7 +276,7 @@ namespace Exeon.ViewModels
 
             Action<object> sendDelayMessage = (obj) =>
             {
-                _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
+                DispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
                 {
                     if (obj is AssistantActionDelayMessageItem delayMessageItem)
                     {
@@ -295,7 +287,7 @@ namespace Exeon.ViewModels
 
             Action<double> changeCommandExecutionProgressBarValue = (value) =>
             {
-                _dispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
+                DispatcherQueueProvider.DispatcherQueue!.TryEnqueue(() =>
                 {
                     AppState.CommandExecutionProgress = value;
                 });

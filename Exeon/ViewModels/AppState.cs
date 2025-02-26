@@ -13,7 +13,6 @@ namespace Exeon.ViewModels
 {
     public class AppState : ObservableObject
     {
-        public const int _navigationViewSidePanelAreaWidth = 48;
         public CustomCommand? OriginalCommandState { get; set; }
 
         public AppState()

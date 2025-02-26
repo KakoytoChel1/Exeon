@@ -1,5 +1,6 @@
 ﻿using Exeon.Models.Actions;
 using Exeon.Models.Commands;
+using Exeon.Services;
 using Exeon.Services.IServices;
 using Exeon.ViewModels.Tools;
 using Exeon.Views.Dialog_pages;
@@ -13,15 +14,12 @@ using System.Windows.Input;
 
 namespace Exeon.ViewModels
 {
-    public class CommandsPageViewModel : ObservableObject
+    public class CommandsPageViewModel : ViewModelBase
     {
-        private readonly INavigationService _navigationService;
-        public AppState AppState { get; }
-
-        public CommandsPageViewModel(INavigationService navigationService, AppState appState)
+        public CommandsPageViewModel(AppState appState, DispatcherQueueProvider dispatcherQueueProvider, INavigationService navigationService,
+            IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
+            : base(appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
         {
-            _navigationService = navigationService;
-            AppState = appState;
         }
 
         #region Properties
@@ -99,7 +97,7 @@ namespace Exeon.ViewModels
 
                                 AppState.IsSidePanelButtonsEnabled = false;
 
-                                _navigationService.ChangePage<ModifyCommandPage>();
+                                NavigationService.ChangePage<ModifyCommandPage>();
                             }
                         }
                     });

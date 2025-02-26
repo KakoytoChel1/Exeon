@@ -1,17 +1,14 @@
-﻿using Exeon.Services.IServices;
-using Exeon.ViewModels.Tools;
+﻿using Exeon.Services;
+using Exeon.Services.IServices;
 
 namespace Exeon.ViewModels
 {
-    public class SettingsPageViewModel : ObservableObject
+    public class SettingsPageViewModel : ViewModelBase
     {
-        private readonly INavigationService _navigationService;
-        private readonly AppState _appState;
-
-        public SettingsPageViewModel(INavigationService navigationService, AppState appState)
+        public SettingsPageViewModel(AppState appState, DispatcherQueueProvider dispatcherQueueProvider, INavigationService navigationService, 
+            IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService) 
+            : base (appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
         {
-            _navigationService = navigationService;
-            _appState = appState;
         }
     }
 }

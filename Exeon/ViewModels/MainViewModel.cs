@@ -1,4 +1,5 @@
-﻿using Exeon.Services.IServices;
+﻿using Exeon.Services;
+using Exeon.Services.IServices;
 using Exeon.ViewModels.Tools;
 using Exeon.Views.Pages;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -6,19 +7,13 @@ using System.Windows.Input;
 
 namespace Exeon.ViewModels
 {
-    public class MainViewModel : ObservableObject
+    public class MainViewModel : ViewModelBase
     {
-        private readonly INavigationService _navigationService;
-        public AppState AppState { get; }
-
-        public MainViewModel(INavigationService navigationService, AppState appState)
+        public MainViewModel(AppState appState, DispatcherQueueProvider dispatcherQueueProvider, INavigationService navigationService,
+            IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
+            : base(appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
         {
-            _navigationService = navigationService;
-            AppState = appState;
-
             AppState.IsSidePanelButtonsEnabled = true;
-
-            var test = AppState.IsSidePanelButtonsEnabled;
         }
 
         #region Properties
@@ -41,13 +36,13 @@ namespace Exeon.ViewModels
                             switch (tag)
                             {
                                 case "Chat":
-                                    _navigationService.ChangePage<ChatPage>(SlideNavigationTransitionEffect.FromLeft);
+                                    NavigationService.ChangePage<ChatPage>(SlideNavigationTransitionEffect.FromLeft);
                                     break;
                                 case "Commands":
-                                    _navigationService.ChangePage<CommandsPage>(SlideNavigationTransitionEffect.FromLeft);
+                                    NavigationService.ChangePage<CommandsPage>(SlideNavigationTransitionEffect.FromLeft);
                                     break;
                                 case "Settings":
-                                    _navigationService.ChangePage<SettingsPage>(SlideNavigationTransitionEffect.FromLeft);
+                                    NavigationService.ChangePage<SettingsPage>(SlideNavigationTransitionEffect.FromLeft);
                                     break;
                             }
                         }
