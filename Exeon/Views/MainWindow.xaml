@@ -61,44 +61,11 @@
             </StackPanel>
         </Border>
 
-        <NavigationView 
-            x:Name="MainNavigationView"
+        <Frame
+            x:Name="RootFrame"
+            Grid.Row="0"
             Grid.RowSpan="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            IsBackButtonVisible="Collapsed"
-            IsSettingsVisible="False"
-            Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
-
-            <NavigationView.Resources>
-                <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
-            </NavigationView.Resources>
-
-            <NavigationView.MenuItems>
-                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Message" Margin="0,20,0,0" Content="Історія запитів" Tag="Chat">
-                </NavigationViewItem>
-
-                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Bookmarks" Content="Команди" Tag="Commands">
-                </NavigationViewItem>
-
-                <!--<NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Setting" Content="Налаштування" Tag="Settings"/>-->
-            </NavigationView.MenuItems>
-
-            <NavigationView.Content>
-                <Grid
-                    Padding="0"
-                    Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
-
-                    <Frame 
-                        x:Name="RootFrame"
-                        Margin="0,48,0,1"
-                        CornerRadius="5,5,0,0"
-                        BorderThickness="1,1,0,0"
-                        BorderBrush="{ThemeResource CircleElevationBorderBrush}"
-                        Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
-                    </Frame>
-                </Grid>
-            </NavigationView.Content>
-        </NavigationView>
+            Grid.ColumnSpan="2">
+        </Frame>
     </Grid>
 </Window>

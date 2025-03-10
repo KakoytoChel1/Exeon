@@ -31,6 +31,8 @@
     <None Remove="Views\Dialog pages\AddNewSoundActionPage.xaml" />
     <None Remove="Views\Dialog pages\AddNewWebActionPage.xaml" />
     <None Remove="Views\Pages\CommandsPage.xaml" />
+    <None Remove="Views\Pages\LoadingPage.xaml" />
+    <None Remove="Views\Pages\MainPage.xaml" />
     <None Remove="Views\Pages\ModifyCommandPage.xaml" />
     <None Remove="Views\Pages\SettingsPage.xaml" />
     <None Remove="Views\Resources\Fonts.xaml" />
@@ -69,6 +71,16 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Management" Version="9.0.1" />
     <PackageReference Include="Vosk" Version="0.3.38" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\LoadingPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Dialog pages\AddNewSoundActionPage.xaml">

@@ -13,7 +13,7 @@ namespace Exeon.ViewModels
             IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
             : base(appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
         {
-            AppState.IsSidePanelButtonsEnabled = true;
+            
         }
 
         #region Properties
@@ -22,35 +22,6 @@ namespace Exeon.ViewModels
 
         #region Commands
 
-        private ICommand? _navigatePageCommand;
-        public ICommand NavigatePageCommand
-        {
-            get
-            {
-                if(_navigatePageCommand == null)
-                {
-                    _navigatePageCommand = new RelayCommand((obj) =>
-                    {
-                        if (obj is string tag)
-                        {
-                            switch (tag)
-                            {
-                                case "Chat":
-                                    NavigationService.ChangePage<ChatPage>(SlideNavigationTransitionEffect.FromLeft);
-                                    break;
-                                case "Commands":
-                                    NavigationService.ChangePage<CommandsPage>(SlideNavigationTransitionEffect.FromLeft);
-                                    break;
-                                case "Settings":
-                                    NavigationService.ChangePage<SettingsPage>(SlideNavigationTransitionEffect.FromLeft);
-                                    break;
-                            }
-                        }
-                    });
-                }
-                return _navigatePageCommand;
-            }
-        }
         #endregion
     }
 }

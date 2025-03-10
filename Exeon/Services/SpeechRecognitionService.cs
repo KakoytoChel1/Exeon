@@ -9,39 +9,57 @@ namespace Exeon.Services
 {
     public class SpeechRecognitionService : ISpeechRecognitionService
     {
-        private readonly Model _model = null!;
+        private Model _model = null!;
         private VoskRecognizer? _recognizer;
         private WaveInEvent? _waveIn;
+        private bool _isInitialized;
 
         public event EventHandler<string> PartialRecognition = null!;
         public event EventHandler<string> FinalRecognition = null!;
 
-        public SpeechRecognitionService(string modelPath)
+        public SpeechRecognitionService() { }
+
+        public async Task InitializeSpeechModel(string pathToModel)
         {
-            _model = new Model(modelPath);
+            await Task.Run(() =>
+            {
+                _model = new Model(pathToModel);
+                _isInitialized = true;
+            });
         }
 
         public async Task StartRecognitionAsync(CancellationToken token)
         {
-            _waveIn = new WaveInEvent
-            {
-                WaveFormat = new WaveFormat(16000, 1)
-            };
-
-            _recognizer = new VoskRecognizer(_model, 16000.0f);
-
-            _waveIn.DataAvailable += _waveIn_DataAvailable;
-
-            _waveIn.StartRecording();
-
             try
             {
-                while (!token.IsCancellationRequested)
+                if(_isInitialized)
                 {
-                    await Task.Delay(100, token);
+                    _waveIn = new WaveInEvent
+                    {
+                        WaveFormat = new WaveFormat(16000, 1)
+                    };
+
+                    _recognizer = new VoskRecognizer(_model, 16000.0f);
+
+                    _waveIn.DataAvailable += _waveIn_DataAvailable;
+
+                    _waveIn.StartRecording();
+
+                    while (!token.IsCancellationRequested)
+                    {
+                        await Task.Delay(100, token);
+                    }
+                }
+                else
+                {
+                    throw new NullReferenceException("Speech model wasn't initialized.");
                 }
             }
             catch (OperationCanceledException)
+            {
+                // ...
+            }
+            catch (Exception ex)
             {
                 // ...
             }

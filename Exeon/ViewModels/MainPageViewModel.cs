@@ -1,5 +1,7 @@
 ﻿using Exeon.Services.IServices;
 using Exeon.Services;
+using Exeon.Views.Pages;
+using System;
 
 namespace Exeon.ViewModels
 {
@@ -9,7 +11,11 @@ namespace Exeon.ViewModels
             IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
             : base(appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
         {
-
+            AppState.IsSidePanelButtonsEnabled = true;
         }
+
+        #region Commands
+
+        #endregion
     }
 }

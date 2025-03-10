@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Controls;
 using Exeon.ViewModels.Tools;
 using Size = System.Drawing.Size;
 using Point = System.Drawing.Point;
+using Exeon.Views.Pages;
 
 namespace Exeon
 {
@@ -40,11 +41,12 @@ namespace Exeon
             }  
         }
 
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<AppState>();
             serviceCollection.AddSingleton<MainViewModel>();
+            serviceCollection.AddSingleton<MainPageViewModel>();
             serviceCollection.AddSingleton<CommandsPageViewModel>();
             serviceCollection.AddSingleton<ModifyCommandPageViewModel>();
             serviceCollection.AddSingleton<ChatPageViewModel>();
@@ -54,8 +56,7 @@ namespace Exeon
             serviceCollection.AddSingleton<INavigationService, NavigationService>();
             serviceCollection.AddSingleton<IConfigurationService, ConfigurationService>();
             serviceCollection.AddSingleton<DispatcherQueueProvider>(); // Initializing in MainWindow's code behind (MainWindow.xaml.cs)
-            serviceCollection.AddSingleton<ISpeechRecognitionService>(provider =>
-                new SpeechRecognitionService(@"C:\Users\KakoytoChel228\Desktop\vosk-model-uk-v3"));
+            serviceCollection.AddSingleton<ISpeechRecognitionService, SpeechRecognitionService>();
 
             Services = serviceCollection.BuildServiceProvider();
 
@@ -66,6 +67,20 @@ namespace Exeon
             _windowHelper.SetMinMaxBounds(new Size(new Point(x: 418, y: 720)));
 
             MainWindow.Activate();
+
+            // Setting up the first visible page
+            var navigationService = Services.GetRequiredService<INavigationService>();
+            navigationService.InitializeFrame(MainWindow.RootFrameProperty);
+
+            // Setting up the loading page until the speech recognition model is initilized
+            navigationService.ChangePage<LoadingPage>();
+
+            // Initializing the speech model
+            var speechRecognitionService = Services.GetRequiredService<ISpeechRecognitionService>();
+            await speechRecognitionService.InitializeSpeechModel(@"C:\Users\KakoytoChel228\Desktop\vosk-model-uk-v3");
+
+            // Setting up the default page after the speech model has been initialized
+            navigationService.ChangePage<MainPage>();
         }
     }
 }

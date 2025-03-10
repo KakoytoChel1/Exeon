@@ -16,6 +16,11 @@ namespace Exeon
     {
         public MainViewModel ViewModel { get; set; }
 
+        public Frame RootFrameProperty
+        {
+            get { return this.RootFrame; }
+        }
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -32,30 +37,11 @@ namespace Exeon
 
             App.Services.GetRequiredService<DispatcherQueueProvider>().Initialize(DispatcherQueue.GetForCurrentThread());
             ViewModel = App.Services.GetRequiredService<MainViewModel>();
-
-            var navigationService = App.Services.GetRequiredService<INavigationService>();
-            navigationService.InitializeFrame(RootFrame);
-            navigationService.ChangePage<ChatPage>();
-            MainNavigationView.SelectedItem = MainNavigationView.MenuItems.OfType<NavigationViewItem>()
-                .FirstOrDefault(i => i.Tag.ToString() == "Chat");
-
-            MainNavigationView.SelectionChanged += MainNavigationView_SelectionChanged;
         }
 
         private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
         {
             UpdateTitleBarTheme();
-        }
-
-        private void MainNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-        {
-            if (args.SelectedItem is NavigationViewItem selectedItem)
-            {
-                if (selectedItem.Tag is string pageTag)
-                {
-                    ViewModel.NavigatePageCommand.Execute(pageTag);
-                }
-            }
         }
 
         private void UpdateTitleBarTheme()
