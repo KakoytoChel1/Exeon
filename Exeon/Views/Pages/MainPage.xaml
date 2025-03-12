@@ -10,11 +10,47 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="48"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Grid.Column="1"
+            Canvas.ZIndex="1"
+            Margin="10,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="6">
+
+            <Ellipse
+                Width="20"
+                Height="20"
+                Stroke="{ThemeResource AccentAAFillColorDefaultBrush}"
+                StrokeThickness="2"
+                Fill="Transparent"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
+
+
+            <TextBlock
+                FontWeight="SemiBold"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Text="Exeon - 1.0 beta"/>
+        </StackPanel>
+
         <NavigationView 
             x:Name="MainNavigationView"
-            Grid.RowSpan="2"
             Grid.Column="0"
             Grid.ColumnSpan="2"
+            Grid.RowSpan="2"
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="False"
             Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}">
@@ -30,7 +66,7 @@
                 <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Bookmarks" Content="Команди" Tag="Commands">
                 </NavigationViewItem>
 
-                <!--<NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Setting" Content="Налаштування" Tag="Settings"/>-->
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Setting" Content="Налаштування" Tag="Settings"/>
             </NavigationView.MenuItems>
 
             <NavigationView.Content>

@@ -1,6 +1,9 @@
 ﻿using Exeon.Models.Actions;
 using Exeon.Models.Commands;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
+using Action = Exeon.Models.Actions.Action;
 
 namespace Exeon.Models
 {
@@ -21,7 +24,13 @@ namespace Exeon.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=C:\\Users\\KakoytoChel228\\Desktop\\Application.db");
+            var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var dbFolder = Path.Combine(appDataFolder, "Exeon");
+            if (!Directory.Exists(dbFolder))
+                Directory.CreateDirectory(dbFolder);
+
+            var dbPath = Path.Combine(dbFolder, "Application.db");
+            optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

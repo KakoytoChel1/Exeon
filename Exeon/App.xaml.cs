@@ -50,7 +50,7 @@ namespace Exeon
             serviceCollection.AddSingleton<CommandsPageViewModel>();
             serviceCollection.AddSingleton<ModifyCommandPageViewModel>();
             serviceCollection.AddSingleton<ChatPageViewModel>();
-            //serviceCollection.AddSingleton<SettingsPageViewModel>();
+            serviceCollection.AddSingleton<SettingsPageViewModel>();
 
             // Intialization of the RootFrame and setting first selected page is in main window's code behind (MainWindow.xaml.cs)
             serviceCollection.AddSingleton<INavigationService, NavigationService>();

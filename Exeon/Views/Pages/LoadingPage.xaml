@@ -10,10 +10,50 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <ProgressRing
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Margin="20,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="6">
+
+            <Ellipse
+                Width="20"
+                Height="20"
+                Stroke="{ThemeResource AccentAAFillColorDefaultBrush}"
+                StrokeThickness="2"
+                Fill="Transparent"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
+
+
+            <TextBlock
+                FontWeight="SemiBold"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Text="Exeon - 1.0 beta"/>
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Width="60"
-            Height="60"/>
+            Spacing="15">
+
+            <ProgressRing
+                Width="50"
+                Height="50"/>
+
+            <TextBlock
+                TextWrapping="Wrap"
+                TextAlignment="Center"
+                FontSize="14"
+                Text="Loading speech model ..."/>
+        </StackPanel>
     </Grid>
 </Page>

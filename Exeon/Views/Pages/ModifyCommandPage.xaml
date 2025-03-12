@@ -270,13 +270,39 @@
     
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
             <RowDefinition Height="70"/>
             <RowDefinition/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
+        <StackPanel
+            Margin="20,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="6">
+
+            <Ellipse
+                Width="20"
+                Height="20"
+                Stroke="{ThemeResource AccentAAFillColorDefaultBrush}"
+                StrokeThickness="2"
+                Fill="Transparent"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
+
+
+            <TextBlock
+                FontWeight="SemiBold"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Text="Exeon - 1.0 beta"/>
+        </StackPanel>
+
         <!--Top panel-->
         <Border
+            Grid.Row="1"
             Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
 
             <Grid
@@ -353,13 +379,14 @@
             AllowDrop="True"
             CanDragItems="True"
             DragItemsCompleted="ListView_DragItemsCompleted"
-            Grid.Row="1"
+            Grid.Row="2"
             ItemTemplateSelector="{StaticResource ActionTemplateSelector}"
             ItemsSource="{x:Bind ViewModel.AppState.SelectedModifyingCustomCommand.Actions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
         </ListView>
 
+        <!--Bottom panel-->
         <Border
-            Grid.Row="2"
+            Grid.Row="3"
             Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
 
             <Grid>

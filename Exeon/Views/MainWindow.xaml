@@ -31,34 +31,6 @@
             IsHitTestVisible="True"
             VerticalAlignment="Stretch"
             Height="48">
-
-            <StackPanel
-                Margin="10,0,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Orientation="Horizontal"
-                Spacing="6">
-
-                <!--<ImageIcon
-                    Height="25"
-                    Source="../Assets/temporaryLogo.png"/>-->
-
-                <Ellipse
-                    Width="20"
-                    Height="20"
-                    Stroke="{ThemeResource AccentAAFillColorDefaultBrush}"
-                    StrokeThickness="2"
-                    Fill="Transparent"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"/>
-
-
-                <TextBlock
-                    FontWeight="SemiBold"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    Text="Exeon - 1.0 beta"/>
-            </StackPanel>
         </Border>
 
         <Frame

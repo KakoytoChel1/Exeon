@@ -56,21 +56,30 @@
                 x:Name="NoMessageHint"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Orientation="Horizontal"
-                Spacing="0">
+                Orientation="Vertical"
+                Spacing="5">
+
+                <Viewbox
+                    Width="50">
+
+                    <SymbolIcon
+                        Margin="3"
+                        Foreground="{ThemeResource TextFillColorDisabledBrush}"
+                        Symbol="Message"/>
+                </Viewbox>
 
                 <TextBlock
                     Foreground="{ThemeResource TextFillColorDisabledBrush}"
-                    FontSize="18"
+                    FontSize="17"
                     TextWrapping="Wrap"
+                    TextAlignment="Center"
                     VerticalAlignment="Center"
-                    FontWeight="SemiLight"
                     MaxWidth="200"
-                    Text="Тут поки порожньо, додайте новий запит"/>
+                    Text="Тут нічого немає, зробіть ваш запит"/>
 
-                <ImageIcon
+                <!--<ImageIcon
                     Width="60"
-                    Source="../../Assets/history.png"/>
+                    Source="../../Assets/history.png"/>-->
 
                 <Interactivity:Interaction.Behaviors>
                     <Interactions:DataTriggerBehavior 
