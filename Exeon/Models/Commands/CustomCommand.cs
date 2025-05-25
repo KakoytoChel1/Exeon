@@ -13,19 +13,23 @@ namespace Exeon.Models.Commands
     {
         public CustomCommand() { }
 
-        public CustomCommand(string command)
-        {
-            Command = command;
-        }
-
         [Key]
         public int Id { get; set; }
 
-        private string _command = null!;
-        public string Command
+        public int OrderIndex { get; set; }
+
+        private ObservableCollection<TriggerCommand> triggerCommands = new ObservableCollection<TriggerCommand>();
+        public ObservableCollection<TriggerCommand> TriggerCommands
         {
-            get { return _command; }
-            set { _command = value; OnPropertyChanged(); }
+            get { return triggerCommands; }
+            set
+            {
+                if (triggerCommands != value)
+                {
+                    triggerCommands = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         private ObservableCollection<Actions.Action> _actions = new ObservableCollection<Actions.Action>();
@@ -40,6 +44,15 @@ namespace Exeon.Models.Commands
                     OnPropertyChanged();
                 }
             }
+        }
+
+        public void AddTriggerCommand(TriggerCommand triggerCommand)
+        {
+            triggerCommand.RootCommand = this;
+            triggerCommand.RootCommandId = Id;
+
+            TriggerCommands.Add(triggerCommand);
+            OnPropertyChanged(nameof(TriggerCommands));
         }
 
         public async Task Execute(Action<bool, string> sendSucccesOrFailedMessage, Action<object> sendDelayMessage, 

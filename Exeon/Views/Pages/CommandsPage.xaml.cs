@@ -69,17 +69,17 @@ namespace Exeon.Views.Pages
 
                 foreach (var command in ViewModel.AppState.CustomCommands)
                 {
-                    var found = splitText.All(key =>
-                        command.Command.ToLower().Contains(key));
+                    //var found = splitText.All(key =>
+                    //    command.Command.ToLower().Contains(key));
 
-                    if (found)
-                    {
-                        suitableItems.Add(new AutoSuggestCommandItem
-                        {
-                            CustomCommand = command,
-                            Title = command.Command
-                        });
-                    }
+                    //if (found)
+                    //{
+                    //    suitableItems.Add(new AutoSuggestCommandItem
+                    //    {
+                    //        CustomCommand = command,
+                    //        Title = command.Command
+                    //    });
+                    //}
                 }
 
                 if (suitableItems.Count == 0)

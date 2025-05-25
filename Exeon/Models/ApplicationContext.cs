@@ -40,6 +40,11 @@ namespace Exeon.Models
                 .WithOne(a => a.RootCommand)
                 .HasForeignKey(a => a.RootCommandId);
 
+            modelBuilder.Entity<CustomCommand>()
+                .HasMany(c => c.TriggerCommands)
+                .WithOne(tc => tc.RootCommand)
+                .HasForeignKey(tc => tc.RootCommandId);
+
             modelBuilder.Entity<FileAction>().HasBaseType<Action>();
             modelBuilder.Entity<WebAction>().HasBaseType<Action>();
             modelBuilder.Entity<PauseAction>().HasBaseType<Action>();

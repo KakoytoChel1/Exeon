@@ -271,7 +271,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48"/>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="auto" MaxHeight="200"/>
             <RowDefinition/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
@@ -314,21 +314,26 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
                 <TextBox
                     x:Name="AdaptiveTextBox"
+                    Margin="0,15,0,0"
                     Padding="10,6,0,0"
-                    Text="{x:Bind ViewModel.AppState.SelectedModifyingCustomCommand.Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PlaceholderText="Тригер команда..."
                     Grid.Column="0"
                     MinWidth="170"
-                    MaxWidth="600"
+                    MaxWidth="300"
                     Height="35"
                     HorizontalAlignment="Left"/>
 
                 <DropDownButton
                     x:Name="AddDropDownButton"
                     Grid.Column="1"
-                    Margin="10,0,0,0"
+                    Margin="10,15,0,0"
                     Content="Додати дію"
                     Style="{StaticResource AccentDropDownButtonStyle}">
 
@@ -371,6 +376,31 @@
                         </MenuFlyout>
                     </DropDownButton.Flyout>
                 </DropDownButton>
+
+                <ListView
+                    x:Name="TriggerCommandsListView"
+                    Margin="0,20,0,20"
+                    MaxHeight="80"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    ItemTemplate="{StaticResource TriggerCommandItemTemplate}"
+                    SelectionMode="None"
+                    HorizontalAlignment="Stretch">
+
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+
+                    <ListBoxItem/>
+                    <ListBoxItem/>
+                    <ListBoxItem/>
+                    <ListBoxItem/>
+                    <ListBoxItem/>
+
+                </ListView>
             </Grid>
         </Border>
 

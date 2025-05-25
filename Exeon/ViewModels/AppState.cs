@@ -92,13 +92,13 @@ namespace Exeon.ViewModels
         {
             bool result = true;
 
-            await Task.Run(() =>
-            {
-                var command = CustomCommands.FirstOrDefault(com => com.Command.ToLower() == commandText);
+            //await Task.Run(() =>
+            //{
+            //    var command = CustomCommands.FirstOrDefault(com => com.Command.ToLower() == commandText);
 
-                if (command != null)
-                    result = false;
-            });
+            //    if (command != null)
+            //        result = false;
+            //});
 
             return result;
         }
@@ -107,13 +107,13 @@ namespace Exeon.ViewModels
         {
             bool result = true;
 
-            await Task.Run(() =>
-            {
-                var command = CustomCommands.FirstOrDefault(com => com.Id != id && com.Command.ToLower() == commandText);
+            //await Task.Run(() =>
+            //{
+            //    var command = CustomCommands.FirstOrDefault(com => com.Id != id && com.Command.ToLower() == commandText);
 
-                if (command != null)
-                    result = false;
-            });
+            //    if (command != null)
+            //        result = false;
+            //});
 
             return result;
         }

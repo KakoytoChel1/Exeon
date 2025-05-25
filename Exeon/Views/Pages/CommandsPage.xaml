@@ -14,6 +14,8 @@
     Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
 
     <Page.Resources>
+        <converters:CollectionToStringConverter x:Key="CollectionToStringConverter"/>
+
         <DataTemplate x:Key="CustomCommandItemTemplate">
             <Grid>
                 <Expander
@@ -40,12 +42,12 @@
                                 Padding="10,5,10,5"
                                 BorderThickness="1.5"
                                 BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
-                                ToolTipService.ToolTip="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                
+                                ToolTipService.ToolTip="{Binding TriggerCommands, Converter={StaticResource CollectionToStringConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+
                                 <TextBlock
                                     x:Name="innerText"
                                     TextTrimming="CharacterEllipsis"
-                                    Text="{Binding Command}"/>
+                                    Text="{Binding TriggerCommands, Converter={StaticResource CollectionToStringConverter}}"/>
                             </Border>
 
                             <Line

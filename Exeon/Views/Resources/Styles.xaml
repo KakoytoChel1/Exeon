@@ -837,4 +837,108 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style x:Key="DeleteTriggerCommandButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="10,5"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <ContentPresenter 
+                        x:Name="ContentPresenter" 
+                        Background="{TemplateBinding Background}" 
+                        Foreground="{TemplateBinding Foreground}" 
+                        BackgroundSizing="{TemplateBinding BackgroundSizing}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        Content="{TemplateBinding Content}" 
+                        ContentTemplate="{TemplateBinding ContentTemplate}" 
+                        ContentTransitions="{TemplateBinding ContentTransitions}" 
+                        CornerRadius="{TemplateBinding CornerRadius}" 
+                        Padding="{TemplateBinding Padding}" 
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                        xmlns:local="using:Microsoft.UI.Xaml.Controls"
+                        local:AnimatedIcon.State="Normal">
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonState">
+                                <VisualState x:Name="Normal" />
+
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#ffffff" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.(controls:AnimatedIcon.State)" Value="PointerOver" />
+                                        <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentFillColorSelectedTextBackgroundBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AccentFillColorSelectedTextBackgroundBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.(controls:AnimatedIcon.State)" Value="Pressed" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </ContentPresenter>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--Trigger commands ListBox data template-->
+    <DataTemplate x:Key="TriggerCommandItemTemplate">
+        <Grid>
+            <Border
+                HorizontalAlignment="Left"
+                CornerRadius="5"
+                Width="auto"
+                Background="{ThemeResource AccentFillColorSecondaryBrush}">
+
+                <StackPanel 
+                    Margin="10,0,0,0"
+                    Height="auto"
+                    Orientation="Horizontal"
+                    Spacing="10">
+
+                    <TextBlock
+                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                        Margin="0,4,0,0"
+                        Text="Команда хахах Команда"/>
+
+                    <Button Style="{StaticResource DeleteTriggerCommandButtonStyle}" Width="30" Height="30">
+                        <Viewbox Margin="-3.5">
+                            <SymbolIcon
+                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                Symbol="Cancel"/>
+                        </Viewbox>
+                    </Button>
+
+                </StackPanel>
+            </Border>
+        </Grid>
+    </DataTemplate>
 </ResourceDictionary>

@@ -58,7 +58,7 @@ namespace Exeon.ViewModels
 
                             if (await AppState.CanAddNewCustomCommand(newCustomCommandtext.ToLower()))
                             {
-                                var newCommand = new CustomCommand(newCustomCommandtext);
+                                var newCommand = new CustomCommand();
                                 AppState.CustomCommands.Add(newCommand);
 
                                 AppState.ApplicationContext.Add(newCommand);
@@ -148,7 +148,6 @@ namespace Exeon.ViewModels
                 AppState.OriginalCommandState = new CustomCommand
                 {
                     Id = commandToEdit.Id,
-                    Command = commandToEdit.Command,
                     Actions = new ObservableCollection<Action>(
                         commandToEdit.Actions.Select(AppState.CloneAction)
                     )

@@ -9,8 +9,52 @@
     mc:Ignorable="d">
 
     <Grid>
-        <TextBox
-            Text="{x:Bind ViewModel.NewCustomCommandCommandText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            PlaceholderText="Введіть команду тригер..."/>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal"
+            Spacing="10">
+
+            <TextBox
+                Width="300"
+                Text="{x:Bind ViewModel.NewCustomCommandCommandText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                PlaceholderText="Введіть команду тригер..."/>
+
+            <Button
+                Height="30"
+                Width="30"
+                Style="{ThemeResource AccentButtonStyle}">
+
+                <Viewbox Margin="-5">
+                    <SymbolIcon
+                        Symbol="Add"/>
+                </Viewbox>
+            </Button>
+        </StackPanel>
+
+        <ListView
+            Margin="0,15,0,0"
+            ItemTemplate="{StaticResource TriggerCommandItemTemplate}"
+            SelectionMode="None"
+            Height="100"
+            Grid.Row="1">
+
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+
+            <ListBoxItem/>
+            <ListBoxItem/>
+            <ListBoxItem/>
+            <ListBoxItem/>
+            <ListBoxItem/>
+            <ListBoxItem/>
+        </ListView>
     </Grid>
 </Page>

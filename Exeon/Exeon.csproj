@@ -29,6 +29,7 @@
     <None Remove="Views\Dialog pages\AddNewFileActionPage.xaml" />
     <None Remove="Views\Dialog pages\AddNewPauseActionPage.xaml" />
     <None Remove="Views\Dialog pages\AddNewSoundActionPage.xaml" />
+    <None Remove="Views\Dialog pages\AddNewTriggerCommand.xaml" />
     <None Remove="Views\Dialog pages\AddNewWebActionPage.xaml" />
     <None Remove="Views\Pages\CommandsPage.xaml" />
     <None Remove="Views\Pages\LoadingPage.xaml" />
@@ -71,6 +72,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Management" Version="9.0.1" />
     <PackageReference Include="Vosk" Version="0.3.38" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Dialog pages\AddNewTriggerCommand.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Pages\MainPage.xaml">
@@ -158,6 +164,6 @@
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsPackageType>MSIX</WindowsPackageType>
   </PropertyGroup>
 </Project>

@@ -75,7 +75,7 @@ namespace Exeon.ViewModels
                         {
                             // Восстановление оригинального состояния команды
                             AppState.SelectedModifyingCustomCommand.Id = AppState.OriginalCommandState.Id;
-                            AppState.SelectedModifyingCustomCommand.Command = AppState.OriginalCommandState.Command;
+                            //AppState.SelectedModifyingCustomCommand.Command = AppState.OriginalCommandState.Command;
                             AppState.SelectedModifyingCustomCommand.Actions = new ObservableCollection<Action>(
                                 AppState.OriginalCommandState.Actions.Select(AppState.CloneAction));
                         }
@@ -97,22 +97,22 @@ namespace Exeon.ViewModels
                 {
                     _saveChanges = new RelayCommand(async (obj) =>
                     { 
-                        var correctCommandText = Regex.Replace(AppState.SelectedModifyingCustomCommand!.Command.Trim(), @"\s{2,}", " ");
+                        //var correctCommandText = Regex.Replace(AppState.SelectedModifyingCustomCommand!.Command.Trim(), @"\s{2,}", " ");
 
-                        if(await AppState.CanModifyCustomCommand(AppState.SelectedModifyingCustomCommand!.Id, correctCommandText.ToLower()))
-                        {
-                            AppState.SelectedModifyingCustomCommand!.Command = correctCommandText;
-                            AppState.ApplicationContext.SaveChanges();
+                        //if(await AppState.CanModifyCustomCommand(AppState.SelectedModifyingCustomCommand!.Id, correctCommandText.ToLower()))
+                        //{
+                        //    AppState.SelectedModifyingCustomCommand!.Command = correctCommandText;
+                        //    AppState.ApplicationContext.SaveChanges();
 
-                            AppState.IsSidePanelButtonsEnabled = true;
-                            NavigationService.GoBack();
-                        }
-                        else
-                        {
-                            var xamlRoot = App.MainWindow.Content.XamlRoot;
-                            await DialogManager.ShowContentDialog(xamlRoot, "Операцію скасовано", "ОК", ContentDialogButton.Primary,
-                                $"Неможливо зберегти нову назву '{correctCommandText}' команди, оскільки вона вже зайнята.");
-                        }
+                        //    AppState.IsSidePanelButtonsEnabled = true;
+                        //    NavigationService.GoBack();
+                        //}
+                        //else
+                        //{
+                        //    var xamlRoot = App.MainWindow.Content.XamlRoot;
+                        //    await DialogManager.ShowContentDialog(xamlRoot, "Операцію скасовано", "ОК", ContentDialogButton.Primary,
+                        //        $"Неможливо зберегти нову назву '{correctCommandText}' команди, оскільки вона вже зайнята.");
+                        //}
                     });
                 }
                 return _saveChanges;

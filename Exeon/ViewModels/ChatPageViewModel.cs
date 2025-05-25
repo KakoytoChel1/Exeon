@@ -244,10 +244,10 @@ namespace Exeon.ViewModels
         {
             CustomCommand? command = null;
 
-            await Task.Run(() =>
-            {
-                command = AppState.CustomCommands.FirstOrDefault(c => c.Command.ToLower() == requestedCommand);
-            });
+            //await Task.Run(() =>
+            //{
+            //    command = AppState.CustomCommands.FirstOrDefault(c => c.Command.ToLower() == requestedCommand);
+            //});
 
             return command;
         }
