@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Action = Exeon.Models.Actions.Action;
 using System.Threading.Tasks;
 using Exeon.Services;
-using System.Text.RegularExpressions;
 
 namespace Exeon.ViewModels
 {

@@ -22,6 +22,7 @@ namespace Exeon.ViewModels
             // Загружаем команды с отсортированными действиями на уровне базы данных
             var commands = ApplicationContext.CustomCommands
                 .Include(c => c.Actions.OrderBy(a => a.OrderIndex)) // Сортируем действия
+                .Include(c => c.TriggerCommands)
                 .ToList();
 
             CustomCommands = new ObservableCollection<CustomCommand>(commands);

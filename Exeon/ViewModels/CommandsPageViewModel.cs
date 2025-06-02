@@ -9,13 +9,15 @@ using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Exeon.ViewModels
 {
     public class CommandsPageViewModel : ViewModelBase
     {
+        // Хранит в себе коллекцию тригер команд в момент создания кастомной команды
+        public ObservableCollection<TriggerCommand>? TemporaryTriggerCommandsCollection { get; private set; } = null;
+
         public CommandsPageViewModel(AppState appState, DispatcherQueueProvider dispatcherQueueProvider, INavigationService navigationService,
             IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
             : base(appState, dispatcherQueueProvider, navigationService, configurationService, speechRecognitionService)
@@ -24,12 +26,6 @@ namespace Exeon.ViewModels
 
         #region Properties
 
-        private string? _newCustomCommandCommandText;
-        public string? NewCustomCommandCommandText
-        {
-            get { return _newCustomCommandCommandText; }
-            set { _newCustomCommandCommandText = value; OnPropertyChanged(); }
-        }
         #endregion
 
         #region Commands
@@ -46,37 +42,72 @@ namespace Exeon.ViewModels
                         // Getting xamlroot for using ContentDialog
                         var xamlRoot = App.MainWindow.Content.XamlRoot;
 
+                        TemporaryTriggerCommandsCollection = new ObservableCollection<TriggerCommand>();
+
                         // Showing content dialog
-                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Додавання команди",
-                            "Додати", ContentDialogButton.Primary, new AddNewCustomCommandPage(), closeBtnText: "Скасувати");
+                        var result = await DialogManager.ShowContentDialog(xamlRoot, "Створення команди",
+                            "Створити", ContentDialogButton.Primary, new AddNewCustomCommandPage(), closeBtnText: "Скасувати");
 
                         // If was pressed primary button - adding new custom command
-                        if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(NewCustomCommandCommandText))
+                        if (result == ContentDialogResult.Primary)
                         {
-                            // Trimming and replacing 2 and more spaces with 1
-                            string newCustomCommandtext = Regex.Replace(NewCustomCommandCommandText.Trim(), @"\s{2,}", " ");
-
-                            if (await AppState.CanAddNewCustomCommand(newCustomCommandtext.ToLower()))
+                            var newCommand = new CustomCommand();
+                            
+                            if(TemporaryTriggerCommandsCollection != null && TemporaryTriggerCommandsCollection.Count > 0)
                             {
-                                var newCommand = new CustomCommand();
-                                AppState.CustomCommands.Add(newCommand);
-
-                                AppState.ApplicationContext.Add(newCommand);
-                                AppState.ApplicationContext.SaveChanges();
-
-                                NewCustomCommandCommandText = string.Empty;
+                                //AddTriggersToDB(TemporaryTriggerCommandsCollection, newCommand);
+                                newCommand.TriggerCommands = TemporaryTriggerCommandsCollection!;
                             }
-                            else
-                            {
-                                await DialogManager.ShowContentDialog(xamlRoot, "Операцію скасовано", "ОК", ContentDialogButton.Primary,
-                                    $"Неможливо створити нову команду з назвою '{newCustomCommandtext}', оскільки вона вже зайнята.");
+                                
+                            AppState.CustomCommands.Add(newCommand);
 
-                                NewCustomCommandCommandText = string.Empty;
-                            }
+                            AppState.ApplicationContext.Add(newCommand);
+                            AppState.ApplicationContext.SaveChanges();
                         }
                     });
                 }
                 return _addNewCustomCommand;
+            }
+        }
+
+        private ICommand? _addNewTriggerCommand;
+        public ICommand AddNewTriggerCommand
+        {
+            get
+            {
+                if (_addNewTriggerCommand == null)
+                {
+                    _addNewTriggerCommand = new RelayCommand((obj) =>
+                    {
+                        string? triggerCommandText = obj as string;
+
+                        // Trimming and replacing 2 and more spaces with 1
+                        string trimmedTriggerCommandText = Regex.Replace(triggerCommandText!.Trim(), @"\s{2,}", " ");
+                        TemporaryTriggerCommandsCollection!.Add(new TriggerCommand() { CommandText = trimmedTriggerCommandText });
+                    });
+                }
+                return _addNewTriggerCommand;
+            }
+        }
+
+        private ICommand? _removeTriggerCommand;
+        public ICommand RemoveTriggerCommand
+        {
+            get
+            {
+                if (_removeTriggerCommand == null)
+                {
+                    _removeTriggerCommand = new RelayCommand((obj) =>
+                    {
+                        TriggerCommand? triggerCommand = obj as TriggerCommand;
+
+                        if (triggerCommand != null)
+                        {
+                            TemporaryTriggerCommandsCollection?.Remove(triggerCommand);
+                        }
+                    });
+                }
+                return _removeTriggerCommand;
             }
         }
 
@@ -155,6 +186,18 @@ namespace Exeon.ViewModels
 
                 AppState.SelectedModifyingCustomCommand = commandToEdit;
             }
+        }
+
+        // Проверка на, существует ли переданная триггер строка в БД
+        public bool IsAlreadyExist(string triggerCommandText)
+        {
+            bool existInDB = AppState.ApplicationContext.TriggerCommands.Any(
+                tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());
+
+            bool existInTemp = TemporaryTriggerCommandsCollection!.Any(
+                tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());
+
+            return existInDB || existInTemp;
         }
     }
 }

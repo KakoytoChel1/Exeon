@@ -15,6 +15,7 @@ namespace Exeon.Models
         }
 
         public DbSet<CustomCommand> CustomCommands { get; set; } = null!;
+        public DbSet<TriggerCommand> TriggerCommands { get; set; } = null!;
         public DbSet<Action> Actions { get; set; } = null!;
         public DbSet<FileAction> FileActions { get; set; } = null!;
         public DbSet<WebAction> WebActions { get; set; } = null!;

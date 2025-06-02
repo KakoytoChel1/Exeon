@@ -52,8 +52,8 @@
             <TextBlock
                 TextWrapping="Wrap"
                 TextAlignment="Center"
-                FontSize="14"
-                Text="Loading speech model ..."/>
+                FontSize="15"
+                Text="Завантаження моделі розпізнавання ..."/>
         </StackPanel>
     </Grid>
 </Page>
