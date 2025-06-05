@@ -26,16 +26,16 @@
                     SizeChanged="CommandItemExpander_SizeChanged">
 
                     <Expander.Header>
-                        <Grid x:Name="HeaderGrid">
+                        <Grid x:Name="HeaderGrid" Margin="-5,0,-20,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="70"/>
                             </Grid.ColumnDefinitions>
 
                             <!--Command panel-->
                             <Border
                                 x:Name="CommandTitlePanel"
-                                MaxWidth="200"
                                 Grid.Column="0"
                                 CornerRadius="5"
                                 Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
@@ -53,13 +53,45 @@
                             <Line
                                 x:Name="CommandItemLine"
                                 Grid.Column="1"
-                                Margin="10,0,-10,0"
+                                Margin="10,0,10,0"
                                 X1="0"
                                 X2="1"
                                 Stroke="{ThemeResource CircleElevationBorderBrush}"
                                 StrokeThickness="2"
                                 VerticalAlignment="Center"
                                 Stretch="Fill"/>
+
+                            <!--Up and Down-->
+                            <StackPanel
+                                Margin="0,0,0,0"
+                                Orientation="Horizontal"
+                                Grid.Column="2"
+                                Spacing="5">
+
+                                <Button
+                                    x:Name="UpBtn"
+                                    Width="30"
+                                    Height="30"
+                                    Click="UpBtn_Click">
+
+                                    <Viewbox
+                                        Margin="-2">
+                                        <FontIcon Glyph="&#xE74A;"/>
+                                    </Viewbox>
+                                </Button>
+
+                                <Button
+                                    x:Name="DownBtn"
+                                    Width="30"
+                                    Height="30"
+                                    Click="DownBtn_Click">
+
+                                    <Viewbox
+                                        Margin="-2">
+                                        <FontIcon Glyph="&#xE74B;"/>
+                                    </Viewbox>
+                                </Button>
+                            </StackPanel>
                         </Grid>
                     </Expander.Header>
 

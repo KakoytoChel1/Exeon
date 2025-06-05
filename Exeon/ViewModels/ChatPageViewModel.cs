@@ -12,6 +12,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml.Controls;
+using FuzzySharp;
 
 namespace Exeon.ViewModels
 {
@@ -209,7 +210,13 @@ namespace Exeon.ViewModels
 
             MessageItems.Add(new UserMessageItem(commandText));
 
-            CustomCommand? command = await FindRequestedCommandAsync(commandText);
+            CustomCommand? command = null;
+
+            // Если режим приблизительного (неявного) распознавания включен/выключен
+            if (AppState.IsApproximateModeOn)
+                command = await FindRequestedCommandApproximatelyAsync(commandText);
+            else
+                command = await FindRequestedCommandAsync(commandText);
 
             if (command != null)
             {
@@ -217,6 +224,7 @@ namespace Exeon.ViewModels
                 {
                     AppState.IsCommandRunning = true;
                     IsEnterCommandPanelEnabled = false;
+
                     ExecuteRequestedCommand(command);
                 }
                 else
@@ -244,12 +252,51 @@ namespace Exeon.ViewModels
         {
             CustomCommand? command = null;
 
-            //await Task.Run(() =>
-            //{
-            //    command = AppState.CustomCommands.FirstOrDefault(c => c.Command.ToLower() == requestedCommand);
-            //});
+            await Task.Run(() =>
+            {
+                foreach(var customCommand in AppState.CustomCommands)
+                {
+                    var relevantTrigger = customCommand.TriggerCommands.FirstOrDefault(tr => tr.CommandText == requestedCommand);
+
+                    if (relevantTrigger != null)
+                    {
+                        command = relevantTrigger.RootCommand;
+                    }
+                }
+            });
 
             return command;
+        }
+
+        private async Task<CustomCommand?> FindRequestedCommandApproximatelyAsync(string requestedCommand)
+        {
+            (TriggerCommand, double)? relevantTrigger = null;
+
+            await Task.Run(() =>
+            {
+                foreach (var customCommand in AppState.CustomCommands)
+                {
+                    foreach(var triggerCommand in customCommand.TriggerCommands)
+                    {
+                        var score = Fuzz.Ratio(requestedCommand, triggerCommand.CommandText);
+
+                        if(score >= 80)
+                        {
+                            if (relevantTrigger == null || score > relevantTrigger.Value.Item2)
+                            {
+                                relevantTrigger = ValueTuple.Create(triggerCommand, score);
+                            }
+                        }
+                    }
+                }
+            });
+
+            if(relevantTrigger != null)
+            {
+                return relevantTrigger.Value.Item1.RootCommand;
+            }
+
+            return null;
         }
 
         private async void ExecuteRequestedCommand(CustomCommand command)

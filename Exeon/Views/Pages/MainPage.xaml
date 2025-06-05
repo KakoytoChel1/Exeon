@@ -43,7 +43,7 @@
                 FontWeight="SemiBold"
                 VerticalAlignment="Center"
                 FontSize="12"
-                Text="Exeon - 1.0 beta"/>
+                Text="{x:Bind ViewModel.AppState.AppTitleText}"/>
         </StackPanel>
 
         <NavigationView 
@@ -60,22 +60,22 @@
             </NavigationView.Resources>
 
             <NavigationView.MenuItems>
-                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Margin="0,20,0,0" Content="Історія запитів" Tag="Chat">
-                    <NavigationViewItem.Icon>
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Message" Margin="0,20,0,0" Content="Історія запитів" Tag="Chat">
+                    <!--<NavigationViewItem.Icon>
                         <ImageIcon Source="../../Assets/history1.png" Margin="-10"/>
-                    </NavigationViewItem.Icon>
+                    </NavigationViewItem.Icon>-->
                 </NavigationViewItem>
 
-                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Content="Команди" Tag="Commands">
-                    <NavigationViewItem.Icon>
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Bookmarks" Content="Команди" Tag="Commands">
+                    <!--<NavigationViewItem.Icon>
                         <ImageIcon Source="../../Assets/execute.png" Margin="-5"/>
-                    </NavigationViewItem.Icon>
+                    </NavigationViewItem.Icon>-->
                 </NavigationViewItem>
 
-                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Content="Налаштування" Tag="Settings">
-                    <NavigationViewItem.Icon>
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Setting" Content="Налаштування" Tag="Settings">
+                    <!--<NavigationViewItem.Icon>
                         <ImageIcon Source="../../Assets/settings1.png" Margin="-12"/>
-                    </NavigationViewItem.Icon>
+                    </NavigationViewItem.Icon>-->
                 </NavigationViewItem>
             </NavigationView.MenuItems>
 

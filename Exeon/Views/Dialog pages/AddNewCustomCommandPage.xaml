@@ -13,31 +13,61 @@
         <DataTemplate x:Key="TCItemTemplate">
             <Grid>
                 <Border
-                    HorizontalAlignment="Left"
                     CornerRadius="5"
+                    MinWidth="150"
                     Width="auto"
                     Background="{ThemeResource AccentFillColorSecondaryBrush}">
 
-                    <StackPanel 
-                        Margin="10,0,0,0"
-                        Height="auto"
-                        Orientation="Horizontal"
-                        Spacing="10">
+                    <Grid 
+                        Margin="10,0,0,0" 
+                        Height="auto">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
 
                         <TextBlock
                             Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                             Margin="0,4,0,0"
-                            Text="{Binding CommandText}"/>
+                            TextTrimming="CharacterEllipsis"
+                            Text="{Binding CommandText}"
+                            ToolTipService.ToolTip="{Binding CommandText}"/>
 
-                        <Button x:Name="DeleteTrigger" Click="DeleteTrigger_Click" Style="{StaticResource DeleteTriggerCommandButtonStyle}" Width="30" Height="30">
+                        <Button
+                            x:Name="CopyTextBtn"
+                            Style="{StaticResource OnTriggerCommandButtonStyle}"
+                            Width="30"
+                            Height="30"
+                            Grid.Column="1"
+                            Click="CopyTextBtn_Click"
+                            ToolTipService.ToolTip="Копіювати текст">
+
+                            <Viewbox Margin="-3.5">
+                                <SymbolIcon
+                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                    Symbol="Copy">
+                                </SymbolIcon>
+                            </Viewbox>
+                        </Button>
+
+                        <Button 
+                            x:Name="DeleteTrigger" 
+                            Click="DeleteTrigger_Click" 
+                            Style="{StaticResource OnTriggerCommandButtonStyle}" 
+                            Width="30" 
+                            Height="30"
+                            Grid.Column="2"
+                            ToolTipService.ToolTip="Видалити тригер">
+                            
                             <Viewbox Margin="-3.5">
                                 <SymbolIcon
                                     Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                     Symbol="Cancel"/>
                             </Viewbox>
                         </Button>
-
-                    </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
         </DataTemplate>
@@ -57,12 +87,12 @@
         <TextBox
             x:Name="EnterTriggerCommandTextBox"
             Grid.Column="0"
+            Margin="0,0,15,0"
             PlaceholderText="Введіть команду тригер..."/>
 
         <Button
             x:Name="AddNewTriggerCommandBtn"
             Grid.Column="1"
-            Margin="15,0,0,0"
             Height="30"
             Width="30"
             Style="{ThemeResource AccentButtonStyle}"

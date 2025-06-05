@@ -838,7 +838,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="DeleteTriggerCommandButtonStyle" TargetType="Button">
+    <Style x:Key="OnTriggerCommandButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Padding" Value="10,5"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -908,37 +908,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <!--Trigger commands ListBox data template-->
-    <DataTemplate x:Key="TriggerCommandItemTemplate">
-        <Grid>
-            <Border
-                HorizontalAlignment="Left"
-                CornerRadius="5"
-                Width="auto"
-                Background="{ThemeResource AccentFillColorSecondaryBrush}">
-
-                <StackPanel 
-                    Margin="10,0,0,0"
-                    Height="auto"
-                    Orientation="Horizontal"
-                    Spacing="10">
-
-                    <TextBlock
-                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                        Margin="0,4,0,0"
-                        Text="Команда хахах Команда"/>
-
-                    <Button Style="{StaticResource DeleteTriggerCommandButtonStyle}" Width="30" Height="30">
-                        <Viewbox Margin="-3.5">
-                            <SymbolIcon
-                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                Symbol="Cancel"/>
-                        </Viewbox>
-                    </Button>
-
-                </StackPanel>
-            </Border>
-        </Grid>
-    </DataTemplate>
 </ResourceDictionary>

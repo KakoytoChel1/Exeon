@@ -55,11 +55,11 @@ namespace Exeon.ViewModels
                             
                             if(TemporaryTriggerCommandsCollection != null && TemporaryTriggerCommandsCollection.Count > 0)
                             {
-                                //AddTriggersToDB(TemporaryTriggerCommandsCollection, newCommand);
                                 newCommand.TriggerCommands = TemporaryTriggerCommandsCollection!;
                             }
                                 
                             AppState.CustomCommands.Add(newCommand);
+                            newCommand.OrderIndex = AppState.CustomCommands.Count - 1;
 
                             AppState.ApplicationContext.Add(newCommand);
                             AppState.ApplicationContext.SaveChanges();
@@ -169,6 +169,81 @@ namespace Exeon.ViewModels
                 return _deleteCustomCommand;
             }
         }
+
+        private ICommand? _dragCommandUpCommand;
+        public ICommand DragCommandUpCommand
+        {
+            get
+            {
+                if(_dragCommandUpCommand == null)
+                {
+                    _dragCommandUpCommand = new RelayCommand((obj) =>
+                    {
+                        CustomCommand? command = obj as CustomCommand;
+
+                        if(command != null)
+                        {
+                            var actedCommandOrderIndex = command.OrderIndex;
+
+                            // Проверка, дабы не выйти за границы
+                            if(actedCommandOrderIndex < AppState.CustomCommands.Count - 1)
+                            {
+                                var nextCommand = AppState.CustomCommands.FirstOrDefault
+                                (c => c.OrderIndex == actedCommandOrderIndex + 1);
+
+                                AppState.CustomCommands.Move(actedCommandOrderIndex, nextCommand!.OrderIndex);
+
+                                command.OrderIndex = nextCommand!.OrderIndex;
+                                nextCommand.OrderIndex = actedCommandOrderIndex;
+
+                                AppState.ApplicationContext.CustomCommands.Update(command);
+                                AppState.ApplicationContext.CustomCommands.Update(nextCommand);
+                                AppState.ApplicationContext.SaveChanges();
+                            }
+                        }
+                    });
+                }
+                return _dragCommandUpCommand;
+            }
+        }
+
+        private ICommand? _dragCommandDownCommand;
+        public ICommand DragCommandDownCommand
+        {
+            get
+            {
+                if (_dragCommandDownCommand == null)
+                {
+                    _dragCommandDownCommand = new RelayCommand((obj) =>
+                    {
+                        CustomCommand? command = obj as CustomCommand;
+
+                        if (command != null)
+                        {
+                            var actedCommandOrderIndex = command.OrderIndex;
+
+                            // Проверка, дабы не выйти за границы
+                            if (actedCommandOrderIndex > 0)
+                            {
+                                var previousCommand = AppState.CustomCommands.FirstOrDefault
+                                (c => c.OrderIndex == actedCommandOrderIndex - 1);
+
+                                AppState.CustomCommands.Move(actedCommandOrderIndex, previousCommand!.OrderIndex);
+
+                                command.OrderIndex = previousCommand!.OrderIndex;
+                                previousCommand.OrderIndex = actedCommandOrderIndex;
+
+                                AppState.ApplicationContext.CustomCommands.Update(command);
+                                AppState.ApplicationContext.CustomCommands.Update(previousCommand);
+                                AppState.ApplicationContext.SaveChanges();
+                            }
+                        }
+                    });
+                }
+                return _dragCommandDownCommand;
+            }
+        }
+
         #endregion
 
         private void StartEditingCommand(CustomCommand commandToEdit)
@@ -181,7 +256,8 @@ namespace Exeon.ViewModels
                     Id = commandToEdit.Id,
                     Actions = new ObservableCollection<Action>(
                         commandToEdit.Actions.Select(AppState.CloneAction)
-                    )
+                    ),
+                    TriggerCommands = new ObservableCollection<TriggerCommand>(commandToEdit.TriggerCommands)
                 };
 
                 AppState.SelectedModifyingCustomCommand = commandToEdit;

@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Action = Exeon.Models.Actions.Action;
 using System.Threading.Tasks;
 using Exeon.Services;
+using Exeon.Models.Commands;
+using System.Text.RegularExpressions;
 
 namespace Exeon.ViewModels
 {
@@ -74,7 +76,8 @@ namespace Exeon.ViewModels
                         {
                             // Восстановление оригинального состояния команды
                             AppState.SelectedModifyingCustomCommand.Id = AppState.OriginalCommandState.Id;
-                            //AppState.SelectedModifyingCustomCommand.Command = AppState.OriginalCommandState.Command;
+                            AppState.SelectedModifyingCustomCommand.TriggerCommands = new ObservableCollection<TriggerCommand>(
+                                AppState.OriginalCommandState.TriggerCommands);
                             AppState.SelectedModifyingCustomCommand.Actions = new ObservableCollection<Action>(
                                 AppState.OriginalCommandState.Actions.Select(AppState.CloneAction));
                         }
@@ -94,27 +97,60 @@ namespace Exeon.ViewModels
             {
                 if (_saveChanges == null)
                 {
-                    _saveChanges = new RelayCommand(async (obj) =>
-                    { 
-                        //var correctCommandText = Regex.Replace(AppState.SelectedModifyingCustomCommand!.Command.Trim(), @"\s{2,}", " ");
+                    _saveChanges = new RelayCommand((obj) =>
+                    {
+                        AppState.ApplicationContext.SaveChanges();
 
-                        //if(await AppState.CanModifyCustomCommand(AppState.SelectedModifyingCustomCommand!.Id, correctCommandText.ToLower()))
-                        //{
-                        //    AppState.SelectedModifyingCustomCommand!.Command = correctCommandText;
-                        //    AppState.ApplicationContext.SaveChanges();
-
-                        //    AppState.IsSidePanelButtonsEnabled = true;
-                        //    NavigationService.GoBack();
-                        //}
-                        //else
-                        //{
-                        //    var xamlRoot = App.MainWindow.Content.XamlRoot;
-                        //    await DialogManager.ShowContentDialog(xamlRoot, "Операцію скасовано", "ОК", ContentDialogButton.Primary,
-                        //        $"Неможливо зберегти нову назву '{correctCommandText}' команди, оскільки вона вже зайнята.");
-                        //}
+                        AppState.IsSidePanelButtonsEnabled = true;
+                        NavigationService.GoBack();
                     });
                 }
                 return _saveChanges;
+            }
+        }
+
+        private ICommand? _addNewTriggerCommand;
+        public ICommand AddNewTriggerCommand
+        {
+            get
+            {
+                if(_addNewTriggerCommand == null)
+                {
+                    _addNewTriggerCommand = new RelayCommand((obj) =>
+                    {
+                        string? triggerCommandText = obj as string;
+
+                        // Trimming and replacing 2 and more spaces with 1
+                        string trimmedTriggerCommandText = Regex.Replace(triggerCommandText!.Trim(), @"\s{2,}", " ");
+                        AppState.SelectedModifyingCustomCommand!.TriggerCommands.Add(new TriggerCommand() { CommandText = trimmedTriggerCommandText });
+                    });
+                }
+                return _addNewTriggerCommand;
+            }
+        }
+
+        private ICommand? _removeTriggerCommand;
+        public ICommand RemoveTriggerCommand
+        {
+            get
+            {
+                if (_removeTriggerCommand == null)
+                {
+                    _removeTriggerCommand = new RelayCommand((obj) =>
+                    {
+                        if (obj is TriggerCommand triggerCommand && AppState.SelectedModifyingCustomCommand != null)
+                        {
+                            AppState.SelectedModifyingCustomCommand.TriggerCommands.Remove(triggerCommand);
+
+                            // Проверяем, отслеживается ли действие в контексте
+                            if (AppState.ApplicationContext.Entry(triggerCommand).State != EntityState.Detached)
+                            {
+                                AppState.ApplicationContext.TriggerCommands.Remove(triggerCommand);
+                            }
+                        }
+                    });
+                }
+                return _removeTriggerCommand;
             }
         }
 
@@ -333,12 +369,14 @@ namespace Exeon.ViewModels
 
                             if (selectedCommand != null)
                             {
+                                // Перезапись индексов порядка
                                 int index = 0;
                                 foreach (var action in selectedCommand.Actions)
                                 {
                                     action.OrderIndex = index++;
                                 }
 
+                                // Отбираем и обновляем только уже сохранённые записи (Id != 0)
                                 var existingActions = selectedCommand.Actions.Where(a => a.Id != 0).ToList();
 
                                 AppState.ApplicationContext.UpdateRange(existingActions);
@@ -352,6 +390,18 @@ namespace Exeon.ViewModels
         #endregion
 
         #region Methods
+
+        // Проверка на, существует ли переданная триггер строка в БД
+        public bool IsAlreadyExist(string triggerCommandText)
+        {
+            bool existInDB = AppState.ApplicationContext.TriggerCommands.Any(
+                tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());
+
+            bool existInTemp = AppState.SelectedModifyingCustomCommand!.TriggerCommands.Any(
+                tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());
+
+            return existInDB || existInTemp;
+        }
         #endregion
     }
 }

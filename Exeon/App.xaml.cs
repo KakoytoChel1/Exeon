@@ -68,6 +68,10 @@ namespace Exeon
 
             MainWindow.Activate();
 
+            Services.GetRequiredService<AppState>().IsApproximateModeOn = 
+                Services.GetRequiredService<IConfigurationService>().Get<bool>("IsApproximateModeOn");
+            var pathToSpeechModel = Services.GetRequiredService<IConfigurationService>().Get<bool>("SpeechModelPath");
+
             // Setting up the first visible page
             var navigationService = Services.GetRequiredService<INavigationService>();
             navigationService.InitializeFrame(MainWindow.RootFrameProperty);

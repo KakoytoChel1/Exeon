@@ -266,6 +266,66 @@
             PauseActionTemplate="{StaticResource PauseActionTemplate}"
             BrightnessActionTemplate="{StaticResource BrightnessActionTemplate}"
             SoundActionTemplate="{StaticResource SoundActionTemplate}"/>
+
+        <!--Trigger commands ListBox data template-->
+        <DataTemplate x:Key="TriggerCommandItemTemplate">
+            <Grid>
+                <Border
+                    CornerRadius="5"
+                    Width="auto"
+                    MinWidth="200"
+                    Background="{ThemeResource AccentFillColorSecondaryBrush}">
+
+                    <Grid 
+                        Margin="10,0,0,0" 
+                        Height="auto">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                            Margin="0,4,0,0"
+                            Text="{Binding CommandText}"
+                            TextTrimming="CharacterEllipsis"/>
+
+                        <Button
+                            x:Name="CopyTriggerTextBtn"
+                            Style="{StaticResource OnTriggerCommandButtonStyle}"
+                            Width="30"
+                            Height="30"
+                            Grid.Column="1"
+                            Click="CopyTriggerTextBtn_Click">
+
+                            <Viewbox Margin="-3.5">
+                                <SymbolIcon
+                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                    Symbol="Copy">
+                                </SymbolIcon>
+                            </Viewbox>
+                        </Button>
+
+                        <Button 
+                            x:Name="RemoveTriggerBtn"
+                            Style="{StaticResource OnTriggerCommandButtonStyle}" 
+                            Width="30" 
+                            Height="30"
+                            Grid.Column="2"
+                            Click="RemoveTriggerBtn_Click">
+
+                            <Viewbox Margin="-3.5">
+                                <SymbolIcon
+                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                    Symbol="Cancel"/>
+                            </Viewbox>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
     
     <Grid>
@@ -297,7 +357,7 @@
                 FontWeight="SemiBold"
                 VerticalAlignment="Center"
                 FontSize="12"
-                Text="Exeon - 1.0 beta"/>
+                Text="{x:Bind ViewModel.AppState.AppTitleText}"/>
         </StackPanel>
 
         <!--Top panel-->
@@ -310,81 +370,53 @@
                 Margin="10,0,10,0">
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <TextBox
-                    x:Name="AdaptiveTextBox"
-                    Margin="0,15,0,0"
-                    Padding="10,6,0,0"
-                    PlaceholderText="Тригер команда..."
+                    x:Name="TriggerTextBox"
                     Grid.Column="0"
-                    MinWidth="170"
-                    MaxWidth="300"
-                    Height="35"
-                    HorizontalAlignment="Left"/>
+                    Margin="0,15,0,0"
+                    PlaceholderText="Введіть команду тригер..."/>
 
-                <DropDownButton
-                    x:Name="AddDropDownButton"
-                    Grid.Column="1"
+                <Button
+                    x:Name="AddNewTriggerBtn"
+                    Width="30"
+                    Height="30"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    Grid.Column="2"
                     Margin="10,15,0,0"
-                    Content="Додати дію"
-                    Style="{StaticResource AccentDropDownButtonStyle}">
+                    Click="AddNewTriggerBtn_Click">
 
-                    <DropDownButton.Flyout>
-                        <MenuFlyout Placement="Bottom">
-                            <MenuFlyoutItem Text="Відкрити файл" 
-                                            Command="{x:Bind ViewModel.AddNewFileActionCommand}">
-                                <MenuFlyoutItem.Icon>
-                                    <SymbolIcon Symbol="OpenFile"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
+                    <Viewbox Margin="-5">
+                        <SymbolIcon
+                            Symbol="Add"/>
+                    </Viewbox>
+                </Button>
 
-                            <MenuFlyoutItem Text="Відкрити веб-сторінку"
-                                            Command="{x:Bind ViewModel.AddNewWebActionCommand}">
-                                <MenuFlyoutItem.Icon>
-                                    <SymbolIcon Symbol="Link"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-
-                            <MenuFlyoutItem Text="Зробити паузу"
-                                            Command="{x:Bind ViewModel.AddNewPauseActionCommand}">
-                                <MenuFlyoutItem.Icon>
-                                    <SymbolIcon Symbol="Clock"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-
-                            <MenuFlyoutItem Text="Змінити яскравість"
-                                            Command="{x:Bind ViewModel.AddNewBrightnessActionCommand}">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE706;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-
-                            <MenuFlyoutItem Text="Змінити рівень звуку"
-                                            Command="{x:Bind ViewModel.AddNewSoundActionCommand}">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE994;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuFlyout>
-                    </DropDownButton.Flyout>
-                </DropDownButton>
+                <InfoBar
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    x:Name="ErrorInfoBar"
+                    Margin="0,10,0,0"
+                    Severity="Error"/>
 
                 <ListView
                     x:Name="TriggerCommandsListView"
                     Margin="0,20,0,20"
                     MaxHeight="80"
-                    Grid.Row="1"
+                    Grid.Row="2"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
                     ItemTemplate="{StaticResource TriggerCommandItemTemplate}"
+                    ItemsSource="{x:Bind ViewModel.AppState.SelectedModifyingCustomCommand.TriggerCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     SelectionMode="None"
                     HorizontalAlignment="Stretch">
 
@@ -393,13 +425,6 @@
                             <ItemsWrapGrid Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
-
-                    <ListBoxItem/>
-                    <ListBoxItem/>
-                    <ListBoxItem/>
-                    <ListBoxItem/>
-                    <ListBoxItem/>
-
                 </ListView>
             </Grid>
         </Border>
@@ -413,6 +438,62 @@
             ItemTemplateSelector="{StaticResource ActionTemplateSelector}"
             ItemsSource="{x:Bind ViewModel.AppState.SelectedModifyingCustomCommand.Actions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
         </ListView>
+
+        <DropDownButton
+            x:Name="AddDropDownButton"
+            Grid.Row="2"
+            VerticalAlignment="Bottom"
+            Margin="10,0,0,10"
+            Content="Додати дію"
+            Width="auto"
+            Height="40"
+            Style="{StaticResource AccentDropDownButtonStyle}">
+
+            <DropDownButton.Flyout>
+                <MenuFlyout Placement="Top">
+                    <MenuFlyoutItem Text="Відкрити файл" 
+                            Command="{x:Bind ViewModel.AddNewFileActionCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <SymbolIcon Symbol="OpenFile"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+
+                    <MenuFlyoutItem Text="Відкрити веб-сторінку"
+                            Command="{x:Bind ViewModel.AddNewWebActionCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <SymbolIcon Symbol="Link"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+
+                    <MenuFlyoutItem Text="Зробити паузу"
+                            Command="{x:Bind ViewModel.AddNewPauseActionCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <SymbolIcon Symbol="Clock"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+
+                    <MenuFlyoutItem Text="Змінити яскравість"
+                            Command="{x:Bind ViewModel.AddNewBrightnessActionCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE706;"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+
+                    <MenuFlyoutItem Text="Змінити рівень звуку"
+                            Command="{x:Bind ViewModel.AddNewSoundActionCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE994;"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                </MenuFlyout>
+            </DropDownButton.Flyout>
+
+            <!--<DropDownButton.Content>
+                <Viewbox Margin="-0.5">
+                    <SymbolIcon Symbol="Add"/>
+                </Viewbox>
+            </DropDownButton.Content>-->
+        </DropDownButton>
 
         <!--Bottom panel-->
         <Border

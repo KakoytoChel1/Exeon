@@ -2,6 +2,7 @@
 using Exeon.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace Exeon.Views.Dialog_pages
 {
@@ -43,6 +44,19 @@ namespace Exeon.Views.Dialog_pages
             if(sender is Button btn && btn.DataContext is TriggerCommand triggerCommand)
             {
                ViewModel.RemoveTriggerCommand.Execute(triggerCommand);
+            }
+        }
+
+        private void CopyTextBtn_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is TriggerCommand triggerCommand)
+            {
+                var text = triggerCommand.CommandText;
+
+                DataPackage dataPackage = new();
+                dataPackage.RequestedOperation = DataPackageOperation.Copy;
+                dataPackage.SetText(text);
+                Clipboard.SetContent(dataPackage);
             }
         }
     }

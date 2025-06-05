@@ -1,8 +1,10 @@
 ﻿using Exeon.Models;
 using Exeon.Models.Actions;
 using Exeon.Models.Commands;
+using Exeon.Services;
 using Exeon.ViewModels.Tools;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,6 +15,7 @@ namespace Exeon.ViewModels
 {
     public class AppState : ObservableObject
     {
+        private const double APP_VERSION = 1.1;
         public CustomCommand? OriginalCommandState { get; set; }
 
         public AppState()
@@ -20,7 +23,7 @@ namespace Exeon.ViewModels
             ApplicationContext = new ApplicationContext();
 
             // Загружаем команды с отсортированными действиями на уровне базы данных
-            var commands = ApplicationContext.CustomCommands
+            var commands = ApplicationContext.CustomCommands.OrderBy(c => c.OrderIndex) // Сортируем команды
                 .Include(c => c.Actions.OrderBy(a => a.OrderIndex)) // Сортируем действия
                 .Include(c => c.TriggerCommands)
                 .ToList();
@@ -35,6 +38,11 @@ namespace Exeon.ViewModels
 
         public ApplicationContext ApplicationContext { get; private set; }
 
+        // Удобство для титулки
+        public string AppTitleText
+        {
+            get { return $"Exeon {APP_VERSION} beta"; }
+        }
 
         private bool _isSidePanelButtonsEnabled;
         public bool IsSidePanelButtonsEnabled
@@ -73,9 +81,17 @@ namespace Exeon.ViewModels
             get { return _isListening; }
             set { _isListening = value; OnPropertyChanged(); }
         }
+
+        private bool _isApproximateModeOn = false;
+        public bool IsApproximateModeOn
+        {
+            get { return _isApproximateModeOn; }
+            set { _isApproximateModeOn = value; OnPropertyChanged(); }
+        }
         #endregion
 
         // Создаем копию данных, таким образом избегая tracking'а со стороны DbContext
+        // Метод нужен, дабы учитывать разносортность типов Actions
         public Action CloneAction(Action action)
         {
             return action switch
@@ -89,34 +105,34 @@ namespace Exeon.ViewModels
             };
         }
 
-        public async Task<bool> CanAddNewCustomCommand(string commandText)
-        {
-            bool result = true;
+        //public async Task<bool> CanAddNewCustomCommand(string commandText)
+        //{
+        //    bool result = true;
 
-            //await Task.Run(() =>
-            //{
-            //    var command = CustomCommands.FirstOrDefault(com => com.Command.ToLower() == commandText);
+        //    await Task.Run(() =>
+        //    {
+        //        var command = CustomCommands.FirstOrDefault(com => com.Command.ToLower() == commandText);
 
-            //    if (command != null)
-            //        result = false;
-            //});
+        //        if (command != null)
+        //            result = false;
+        //    });
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        public async Task<bool> CanModifyCustomCommand(int id, string commandText)
-        {
-            bool result = true;
+        //public async Task<bool> CanModifyCustomCommand(int id, string commandText)
+        //{
+        //    bool result = true;
 
-            //await Task.Run(() =>
-            //{
-            //    var command = CustomCommands.FirstOrDefault(com => com.Id != id && com.Command.ToLower() == commandText);
+        //    await Task.Run(() =>
+        //    {
+        //        var command = CustomCommands.FirstOrDefault(com => com.Id != id && com.Command.ToLower() == commandText);
 
-            //    if (command != null)
-            //        result = false;
-            //});
+        //        if (command != null)
+        //            result = false;
+        //    });
 
-            return result;
-        }
+        //    return result;
+        //}
     }
 }

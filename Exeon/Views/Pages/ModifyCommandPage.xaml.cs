@@ -1,5 +1,6 @@
 ﻿using System;
 using Exeon.Models.Actions;
+using Exeon.Models.Commands;
 using Exeon.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -16,19 +17,6 @@ namespace Exeon.Views.Pages
         {
             this.InitializeComponent();
             ViewModel = App.Services.GetRequiredService<ModifyCommandPageViewModel>();
-
-            modifyCommandPage.SizeChanged += ModifyCommandPage_SizeChanged;
-        }
-
-        private void ModifyCommandPage_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            // Getting width of the available space for TextBox
-            var buttonWidth = AddDropDownButton.ActualWidth;
-            var margin = PanelGrid.Margin.Left + PanelGrid.Margin.Right + AddDropDownButton.Margin.Left;
-
-            // Расчёт доступной ширины
-            var availableWidth = e.NewSize.Width - buttonWidth - margin;
-            AdaptiveTextBox.Width = System.Math.Clamp(availableWidth, 170, 600);
         }
 
         private void DeleteFileAction_Click(object sender, RoutedEventArgs e)
@@ -95,6 +83,50 @@ namespace Exeon.Views.Pages
         private void ListView_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
         {
             ViewModel.ChangeOrderInActionCollection.Execute(null);
+        }
+
+        private void AddNewTriggerBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var text = TriggerTextBox.Text;
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                ErrorInfoBar.Message = "Ви залишили поле пустим, заповніть його!";
+                ErrorInfoBar.IsOpen = true;
+                return;
+            }
+
+            if (ViewModel.IsAlreadyExist(text))
+            {
+                ErrorInfoBar.Message = "Такий тригер вже існує, вигадайте новий!";
+                ErrorInfoBar.IsOpen = true;
+                return;
+            }
+
+            ViewModel.AddNewTriggerCommand.Execute(text);
+            TriggerTextBox.Text = string.Empty;
+            ErrorInfoBar.IsOpen = false;
+        }
+
+        private void CopyTriggerTextBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is TriggerCommand triggerCommand)
+            {
+                var text = triggerCommand.CommandText;
+
+                DataPackage dataPackage = new();
+                dataPackage.RequestedOperation = DataPackageOperation.Copy;
+                dataPackage.SetText(text);
+                Clipboard.SetContent(dataPackage);
+            }
+        }
+
+        private void RemoveTriggerBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is TriggerCommand triggerCommand)
+            {
+                ViewModel.RemoveTriggerCommand.Execute(triggerCommand);
+            }
         }
     }
 }

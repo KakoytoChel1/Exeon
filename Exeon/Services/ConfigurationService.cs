@@ -27,7 +27,8 @@ namespace Exeon.Services
                 {
                     { "SpeechModelPath", "" },
                     { "UILanguage", "UA" },
-                    { "StartPageTag", "Chat" }
+                    { "StartPageTag", "Chat" },
+                    { "IsApproximateModeOn", "false" }
                 };
                 SaveConfiguration();
             }

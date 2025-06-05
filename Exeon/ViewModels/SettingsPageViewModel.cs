@@ -22,14 +22,21 @@ namespace Exeon.ViewModels
         public bool IsSelecting
         {
             get { return _isSelecting; }
-            set {  _isSelecting = value; OnPropertyChanged(nameof(IsSelecting)); }
+            set {  _isSelecting = value; OnPropertyChanged(); }
         }
 
         private string? _speechRecognitionModelPath;
         public string? SpeechRecognitionModelPath
         {
             get { return _speechRecognitionModelPath; }
-            set { _speechRecognitionModelPath = value; OnPropertyChanged(nameof(SpeechRecognitionModelPath)); }
+            set { _speechRecognitionModelPath = value; OnPropertyChanged(); }
+        }
+
+        private bool _unsavedChangesExist;
+        public bool UnsavedChangesExist
+        {
+            get { return _unsavedChangesExist; }
+            set { _unsavedChangesExist = value; OnPropertyChanged(); }
         }
         #endregion
 
@@ -61,6 +68,7 @@ namespace Exeon.ViewModels
                         if (file != null)
                         {
                             SpeechRecognitionModelPath = file.Path;
+                            UnsavedChangesExist = true;
                         }
 
                         IsSelecting = false;
@@ -81,9 +89,31 @@ namespace Exeon.ViewModels
                     _saveDataToConfigurationFileCommand = new RelayCommand((obj) =>
                     {
                         ConfigurationService.Set("SpeechModelPath", SpeechRecognitionModelPath);
+                        ConfigurationService.Set("IsApproximateModeOn", AppState.IsApproximateModeOn);
+
+                        UnsavedChangesExist = false;
                     });
                 }
                 return _saveDataToConfigurationFileCommand;
+            }
+        }
+
+        private ICommand? _restoreDataFromConfigCommand;
+        public ICommand? RestoreDataFromConfigCommand
+        {
+            get
+            {
+                if (_restoreDataFromConfigCommand == null)
+                {
+                    _restoreDataFromConfigCommand = new RelayCommand((obj) =>
+                    {
+                        SpeechRecognitionModelPath = ConfigurationService.Get<string>("SpeechModelPath");
+                        AppState.IsApproximateModeOn = ConfigurationService.Get<bool>("IsApproximateModeOn");
+
+                        UnsavedChangesExist = false;
+                    });
+                }
+                return _restoreDataFromConfigCommand;
             }
         }
 

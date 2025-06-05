@@ -11,60 +11,141 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
-        <!--Speech model path selector-->
+        <InfoBar
+            IsOpen="{x:Bind ViewModel.UnsavedChangesExist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Severity="Warning"
+            IsClosable="False"
+            Title="Не збережені зміни!"
+            Message="Вам треба зберегти внесені вами нові налаштування."/>
+
         <StackPanel
-            Margin="10,20,0,0"
-            Spacing="10"
+            Grid.Row="1"
             Orientation="Vertical">
 
-            <TextBlock
-                VerticalAlignment="Center"
-                Text="Speech recognition model path"/>
+            <!--Speech model path selector-->
+            <StackPanel
+                Margin="10,20,0,0"
+                Spacing="10"
+                Orientation="Vertical">
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Text="Шлях до файлу моделі розпізнавання"/>
+
+                <StackPanel
+                    Orientation="Horizontal"
+                    Spacing="10">
+
+                    <TextBox
+                        Width="200"
+                        FontSize="13"
+                        Height="30"
+                        PlaceholderText="Select path to directory"
+                        Text="{x:Bind ViewModel.SpeechRecognitionModelPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>    
+
+                    <Button
+                        Style="{ThemeResource AccentButtonStyle}"
+                        Grid.Column="1"
+                        Width="32"
+                        Height="32"
+                        Command="{x:Bind ViewModel.SelectSpeechRecognitionModelPathCommand}">
+
+                        <Viewbox
+                            Margin="-3.5">
+
+                            <SymbolIcon Symbol="OpenFile"/>
+                        </Viewbox>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
 
             <StackPanel
-                Orientation="Horizontal"
-                Spacing="10">
+                Margin="10,20,0,0"
+                Orientation="Vertical">
+                
+                <StackPanel
+                    Orientation="Horizontal"
+                    Spacing="10">
 
-                <TextBox
-                    Width="200"
-                    FontSize="13"
-                    Height="30"
-                    PlaceholderText="Select path to directory"
-                    Text="{x:Bind ViewModel.SpeechRecognitionModelPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="Приблизне роспізнавання"/>
 
-                <Button
-                    Style="{ThemeResource AccentButtonStyle}"
-                    Grid.Column="1"
-                    Width="32"
-                    Height="32"
-                    Command="{x:Bind ViewModel.SelectSpeechRecognitionModelPathCommand}">
+                    <Button
+                        x:Name="ApproximateModeHelpBtn"
+                        Background="Transparent"
+                        Width="30"
+                        Height="30"
+                        Click="ApproximateModeHelpBtn_Click">
 
-                    <Viewbox
-                        Margin="-3.5">
+                        <Viewbox Margin="-4">
+                            <FontIcon Glyph="&#xE897;" />
+                        </Viewbox>
+                    </Button>
 
-                        <SymbolIcon Symbol="OpenFile"/>
-                    </Viewbox>
-                </Button>
+                    <TeachingTip
+                            x:Name="TeachingTip"
+                            Title="Приблизне роспізнавання"
+                            Target="{x:Bind ApproximateModeHelpBtn}">
+                        
+                        <TeachingTip.IconSource>
+                            <SymbolIconSource Symbol="Help" />
+                        </TeachingTip.IconSource>
+
+                        <TeachingTip.Content>
+                            <TextBlock
+                                Margin="0,16,0,0"
+                                Text="Після розпізнавання, програма буде шукати та виконувати команду, тригер слова якої за сумістністю сказаного та існуючого відповідають 80% і вище."
+                                TextWrapping="WrapWholeWords" />
+                        </TeachingTip.Content>
+
+                    </TeachingTip>
+                </StackPanel>
+
+                <ToggleSwitch
+                    x:Name="ApproxModeToggle"
+                    Toggled="ApproxModeToggle_Toggled"
+                    IsOn="{x:Bind ViewModel.AppState.IsApproximateModeOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
         </StackPanel>
 
         <Button
-            Grid.RowSpan="2"
+            Grid.Row="2"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Right"
             Margin="0,0,20,20"
             Height="40"
             Width="40"
             Command="{x:Bind ViewModel.SaveDataToConfigurationFileCommand}"
-            Style="{ThemeResource AccentButtonStyle}">
+            Style="{ThemeResource AccentButtonStyle}"
+            ToolTipService.ToolTip="Зберегти">
 
             <Viewbox>
                 <SymbolIcon
                     Symbol="SaveLocal"/>
+            </Viewbox>
+        </Button>
+
+        <Button
+            Grid.Row="2"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0,0,70,20"
+            Height="40"
+            Width="40"
+            Style="{ThemeResource AccentButtonStyle}"
+            Command="{x:Bind ViewModel.RestoreDataFromConfigCommand}"
+            ToolTipService.ToolTip="Відновити зі збереженного">
+
+            <Viewbox>
+                <FontIcon Glyph="&#xE777;" />
             </Viewbox>
         </Button>
     </Grid>
