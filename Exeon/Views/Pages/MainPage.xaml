@@ -77,6 +77,9 @@
                         <ImageIcon Source="../../Assets/settings1.png" Margin="-12"/>
                     </NavigationViewItem.Icon>-->
                 </NavigationViewItem>
+
+                <NavigationViewItem IsEnabled="{x:Bind ViewModel.AppState.IsSidePanelButtonsEnabled, Mode=OneWay}" Icon="Help" Content="Посібник" Tag="Guide">
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <NavigationView.Content>

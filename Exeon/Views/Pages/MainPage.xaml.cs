@@ -51,6 +51,9 @@ namespace Exeon.Views.Pages
                 case "Settings":
                     RootFrame.Navigate(typeof(SettingsPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
                     break;
+                case "Guide":
+                    RootFrame.Navigate(typeof(GuidePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
+                    break;
             }
         }
     }

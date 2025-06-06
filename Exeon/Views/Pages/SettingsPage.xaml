@@ -92,7 +92,7 @@
 
                     <TeachingTip
                             x:Name="TeachingTip"
-                            Title="Приблизне роспізнавання"
+                            Title="Приблизне розпізнавання"
                             Target="{x:Bind ApproximateModeHelpBtn}">
                         
                         <TeachingTip.IconSource>

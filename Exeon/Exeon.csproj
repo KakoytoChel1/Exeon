@@ -32,6 +32,7 @@
     <None Remove="Views\Dialog pages\AddNewTriggerCommand.xaml" />
     <None Remove="Views\Dialog pages\AddNewWebActionPage.xaml" />
     <None Remove="Views\Pages\CommandsPage.xaml" />
+    <None Remove="Views\Pages\GuidePage.xaml" />
     <None Remove="Views\Pages\LoadingPage.xaml" />
     <None Remove="Views\Pages\MainPage.xaml" />
     <None Remove="Views\Pages\ModifyCommandPage.xaml" />
@@ -73,6 +74,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Management" Version="9.0.1" />
     <PackageReference Include="Vosk" Version="0.3.38" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Pages\GuidePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Dialog pages\AddNewTriggerCommand.xaml">
