@@ -9,11 +9,10 @@ namespace Exeon.ViewModels
         public const int _navigationViewSidePanelAreaWidth = 48;
 
         public AppState AppState { get; private set; }
-        protected INavigationService NavigationService { get; private set; }
-        protected IConfigurationService ConfigurationService { get; private set; }
-        protected ISpeechRecognitionService SpeechRecognitionService { get; private set; }
-
-        protected DispatcherQueueProvider DispatcherQueueProvider { get; private set; }
+        public INavigationService NavigationService { get; private set; }
+        public IConfigurationService ConfigurationService { get; private set; }
+        public ISpeechRecognitionService SpeechRecognitionService { get; private set; }
+        public DispatcherQueueProvider DispatcherQueueProvider { get; private set; }
 
         public ViewModelBase(AppState appState, DispatcherQueueProvider dispatcherQueueProvider, INavigationService navigationService, IConfigurationService configurationService, ISpeechRecognitionService speechRecognitionService)
         {

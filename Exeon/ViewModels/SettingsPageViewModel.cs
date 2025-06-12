@@ -88,10 +88,16 @@ namespace Exeon.ViewModels
                 {
                     _saveDataToConfigurationFileCommand = new RelayCommand((obj) =>
                     {
-                        ConfigurationService.Set("SpeechModelPath", SpeechRecognitionModelPath);
-                        ConfigurationService.Set("IsApproximateModeOn", AppState.IsApproximateModeOn);
+                        if (!string.IsNullOrWhiteSpace(SpeechRecognitionModelPath))
+                        {
+                            if(!CheckSpeechModelPathEquality(SpeechRecognitionModelPath.Trim()))
+                                AppState.IsSpeechModelWarningVisible = true;
 
-                        UnsavedChangesExist = false;
+                            ConfigurationService.Set("SpeechModelPath", SpeechRecognitionModelPath.Trim());
+                            ConfigurationService.Set("IsApproximateModeOn", AppState.IsApproximateModeOn);
+
+                            UnsavedChangesExist = false;
+                        }
                     });
                 }
                 return _saveDataToConfigurationFileCommand;
@@ -115,6 +121,14 @@ namespace Exeon.ViewModels
                 }
                 return _restoreDataFromConfigCommand;
             }
+        }
+
+        private bool CheckSpeechModelPathEquality(string path)
+        {
+            var pathInConfig = ConfigurationService.Get<string>("SpeechModelPath");
+            if (Equals(pathInConfig, path))
+                return true;
+            return false;
         }
 
         #endregion

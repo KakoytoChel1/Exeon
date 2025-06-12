@@ -1,14 +1,11 @@
 ﻿using Exeon.Models;
 using Exeon.Models.Actions;
 using Exeon.Models.Commands;
-using Exeon.Services;
 using Exeon.ViewModels.Tools;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Action = Exeon.Models.Actions.Action;
 
 namespace Exeon.ViewModels
@@ -29,6 +26,8 @@ namespace Exeon.ViewModels
                 .ToList();
 
             CustomCommands = new ObservableCollection<CustomCommand>(commands);
+
+            IsSpeechModelWarningVisible = false;
         }
 
 
@@ -49,6 +48,20 @@ namespace Exeon.ViewModels
         {
             get { return _isSidePanelButtonsEnabled; }
             set { _isSidePanelButtonsEnabled = value; OnPropertyChanged(); }
+        }
+
+        private bool _isSpeechModelWarningVisible;
+        public bool IsSpeechModelWarningVisible
+        {
+            get { return _isSpeechModelWarningVisible; }
+            set { _isSpeechModelWarningVisible = value; OnPropertyChanged(); }
+        }
+
+        private bool _isSpeechModelInitializingFailed;
+        public bool IsSpeechModelInitializingFailed
+        {
+            get { return _isSpeechModelInitializingFailed; }
+            set { _isSpeechModelInitializingFailed = value; OnPropertyChanged(); }
         }
 
         private CustomCommand? _selectedModifyingCustomCommand;
@@ -104,35 +117,5 @@ namespace Exeon.ViewModels
                 _ => throw new NotSupportedException($"Unsupported action type: {action.GetType().Name}")
             };
         }
-
-        //public async Task<bool> CanAddNewCustomCommand(string commandText)
-        //{
-        //    bool result = true;
-
-        //    await Task.Run(() =>
-        //    {
-        //        var command = CustomCommands.FirstOrDefault(com => com.Command.ToLower() == commandText);
-
-        //        if (command != null)
-        //            result = false;
-        //    });
-
-        //    return result;
-        //}
-
-        //public async Task<bool> CanModifyCustomCommand(int id, string commandText)
-        //{
-        //    bool result = true;
-
-        //    await Task.Run(() =>
-        //    {
-        //        var command = CustomCommands.FirstOrDefault(com => com.Id != id && com.Command.ToLower() == commandText);
-
-        //        if (command != null)
-        //            result = false;
-        //    });
-
-        //    return result;
-        //}
     }
 }

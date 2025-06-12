@@ -9,6 +9,8 @@ namespace Exeon.Services.IServices
         event EventHandler<string> PartialRecognition;
         event EventHandler<string> FinalRecognition;
 
+        bool IsInitialized { get; }
+
         Task InitializeSpeechModel(string pathToModel);
         Task StartRecognitionAsync(CancellationToken token);
         void StopRecognition();

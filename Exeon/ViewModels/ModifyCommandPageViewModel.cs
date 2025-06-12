@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Exeon.Services;
 using Exeon.Models.Commands;
 using System.Text.RegularExpressions;
+using Exeon.Views.Pages;
 
 namespace Exeon.ViewModels
 {
@@ -83,7 +84,7 @@ namespace Exeon.ViewModels
                         }
 
                         AppState.IsSidePanelButtonsEnabled = true;
-                        NavigationService.GoBack();
+                        NavigationService.ChangePage<MainPage>();
                     });
                 }
                 return _cancelModifyingCommand;
@@ -102,7 +103,7 @@ namespace Exeon.ViewModels
                         AppState.ApplicationContext.SaveChanges();
 
                         AppState.IsSidePanelButtonsEnabled = true;
-                        NavigationService.GoBack();
+                        NavigationService.ChangePage<MainPage>();
                     });
                 }
                 return _saveChanges;

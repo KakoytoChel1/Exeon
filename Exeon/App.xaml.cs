@@ -10,6 +10,7 @@ using Exeon.ViewModels.Tools;
 using Size = System.Drawing.Size;
 using Point = System.Drawing.Point;
 using Exeon.Views.Pages;
+using System.IO;
 
 namespace Exeon
 {
@@ -76,15 +77,27 @@ namespace Exeon
             var navigationService = Services.GetRequiredService<INavigationService>();
             navigationService.InitializeFrame(MainWindow.RootFrameProperty);
 
-            // Setting up the loading page until the speech recognition model is initilized
-            navigationService.ChangePage<LoadingPage>();
+            var extractedPathToModel = Services.GetRequiredService<IConfigurationService>().Get<string>("SpeechModelPath");
 
-            // Initializing the speech model
-            var speechRecognitionService = Services.GetRequiredService<ISpeechRecognitionService>();
-            await speechRecognitionService.InitializeSpeechModel(@"C:\Users\KakoytoChel228\Desktop\vosk-model-uk-v3");
+            if (!string.IsNullOrWhiteSpace(extractedPathToModel) && Directory.Exists(extractedPathToModel))
+            {
+                // Setting up the loading page until the speech recognition model is initilized
+                navigationService.ChangePage<LoadingPage>();
 
-            // Setting up the default page after the speech model has been initialized
-            navigationService.ChangePage<MainPage>();
+                // Initializing the speech model
+                var speechRecognitionService = Services.GetRequiredService<ISpeechRecognitionService>();
+                await speechRecognitionService.InitializeSpeechModel(extractedPathToModel);
+
+                Services.GetRequiredService<AppState>().IsSpeechModelInitializingFailed = !speechRecognitionService.IsInitialized;
+
+                // Setting up the default page after the speech model has been initialized
+                navigationService.ChangePage<MainPage>();
+            }
+            else
+            {
+                navigationService.ChangePage<MainPage>();
+                Services.GetRequiredService<AppState>().IsSpeechModelInitializingFailed = true;
+            }
         }
     }
 }

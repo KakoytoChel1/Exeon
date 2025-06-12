@@ -17,6 +17,11 @@ namespace Exeon.Services
         public event EventHandler<string> PartialRecognition = null!;
         public event EventHandler<string> FinalRecognition = null!;
 
+        public bool IsInitialized
+        {
+            get { return _isInitialized; }
+        }
+
         public SpeechRecognitionService() { }
 
         public async Task InitializeSpeechModel(string pathToModel)
@@ -30,8 +35,8 @@ namespace Exeon.Services
 
         public async Task StartRecognitionAsync(CancellationToken token)
         {
-            try
-            {
+            //try
+            //{
                 if(_isInitialized)
                 {
                     _waveIn = new WaveInEvent
@@ -54,15 +59,15 @@ namespace Exeon.Services
                 {
                     throw new NullReferenceException("Speech model wasn't initialized.");
                 }
-            }
-            catch (OperationCanceledException)
-            {
+            //}
+            //catch (OperationCanceledException)
+            //{
                 // ...
-            }
-            catch (Exception ex)
-            {
+            //}
+            //catch (Exception ex)
+            //{
                 // ...
-            }
+            //}
         }
 
         private void _waveIn_DataAvailable(object? sender, WaveInEventArgs e)

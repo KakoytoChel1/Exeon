@@ -1,3 +1,4 @@
+using Exeon.Services.IServices;
 using Exeon.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
@@ -22,17 +23,20 @@ namespace Exeon.Views.Pages
 
         private void MainPage_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            NavigateToProvidedPage("Chat");
+            string lastSavedPageTag = ViewModel.ConfigurationService.Get<string>("StartPageTag");
+            NavigateToProvidedPage(lastSavedPageTag);
             MainNavigationView.SelectedItem = MainNavigationView.MenuItems.OfType<NavigationViewItem>()
-                        .FirstOrDefault(i => i.Tag.ToString() == "Chat");
+                        .FirstOrDefault(i => i.Tag.ToString() == lastSavedPageTag);
         }
 
         private void MainNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
+
             if (args.SelectedItem is NavigationViewItem selectedItem)
             {
                 if (selectedItem.Tag is string pageTag)
                 {
+                    ViewModel.ConfigurationService.Set("StartPageTag", pageTag);
                     NavigateToProvidedPage(pageTag);
                 }
             }
