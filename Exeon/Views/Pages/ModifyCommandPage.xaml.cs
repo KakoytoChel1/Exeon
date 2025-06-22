@@ -96,7 +96,7 @@ namespace Exeon.Views.Pages
                 return;
             }
 
-            if (ViewModel.IsAlreadyExist(text))
+            if (ViewModel.IsAlreadyExistModifying(text))
             {
                 ErrorInfoBar.Message = "Такий тригер вже існує, вигадайте новий!";
                 ErrorInfoBar.IsOpen = true;

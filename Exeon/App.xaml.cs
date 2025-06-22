@@ -69,26 +69,32 @@ namespace Exeon
 
             MainWindow.Activate();
 
-            Services.GetRequiredService<AppState>().IsApproximateModeOn = 
-                Services.GetRequiredService<IConfigurationService>().Get<bool>("IsApproximateModeOn");
-            var pathToSpeechModel = Services.GetRequiredService<IConfigurationService>().Get<bool>("SpeechModelPath");
+            var configService = Services.GetRequiredService<IConfigurationService>();
+            var appState = Services.GetRequiredService<AppState>();
+            var navigationService = Services.GetRequiredService<INavigationService>();
+            var speechRecognitionService = Services.GetRequiredService<ISpeechRecognitionService>();
 
             // Setting up the first visible page
-            var navigationService = Services.GetRequiredService<INavigationService>();
             navigationService.InitializeFrame(MainWindow.RootFrameProperty);
 
-            var extractedPathToModel = Services.GetRequiredService<IConfigurationService>().Get<string>("SpeechModelPath");
+            // Setting up the loading page until the speech recognition model is initilized
+            navigationService.ChangePage<LoadingPage>();
+
+            await configService.InitAsync();
+            await appState.InitializeDataBase();
+
+            appState.IsApproximateModeOn =
+                configService.Get<bool>("IsApproximateModeOn");
+            var pathToSpeechModel = configService.Get<bool>("SpeechModelPath");
+
+            var extractedPathToModel = configService.Get<string>("SpeechModelPath");
 
             if (!string.IsNullOrWhiteSpace(extractedPathToModel) && Directory.Exists(extractedPathToModel))
             {
-                // Setting up the loading page until the speech recognition model is initilized
-                navigationService.ChangePage<LoadingPage>();
-
                 // Initializing the speech model
-                var speechRecognitionService = Services.GetRequiredService<ISpeechRecognitionService>();
                 await speechRecognitionService.InitializeSpeechModel(extractedPathToModel);
 
-                Services.GetRequiredService<AppState>().IsSpeechModelInitializingFailed = !speechRecognitionService.IsInitialized;
+                appState.IsSpeechModelInitializingFailed = !speechRecognitionService.IsInitialized;
 
                 // Setting up the default page after the speech model has been initialized
                 navigationService.ChangePage<MainPage>();
@@ -96,7 +102,7 @@ namespace Exeon
             else
             {
                 navigationService.ChangePage<MainPage>();
-                Services.GetRequiredService<AppState>().IsSpeechModelInitializingFailed = true;
+                appState.IsSpeechModelInitializingFailed = true;
             }
         }
     }

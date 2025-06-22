@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Action = Exeon.Models.Actions.Action;
 
 namespace Exeon.ViewModels
@@ -15,8 +16,11 @@ namespace Exeon.ViewModels
         private const double APP_VERSION = 1.1;
         public CustomCommand? OriginalCommandState { get; set; }
 
-        public AppState()
+        public AppState() { }
+
+        public async Task InitializeDataBase()
         {
+            await ApplicationContext.InitializeDatabasePathAsync();
             ApplicationContext = new ApplicationContext();
 
             // Загружаем команды с отсортированными действиями на уровне базы данных
@@ -30,12 +34,11 @@ namespace Exeon.ViewModels
             IsSpeechModelWarningVisible = false;
         }
 
-
         #region Properties
 
-        public ObservableCollection<CustomCommand> CustomCommands { get; set; }
+        public ObservableCollection<CustomCommand> CustomCommands { get; set; } = null!;
 
-        public ApplicationContext ApplicationContext { get; private set; }
+        public ApplicationContext ApplicationContext { get; private set; } = null!;
 
         // Удобство для титулки
         public string AppTitleText

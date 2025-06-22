@@ -2,16 +2,26 @@
 using Exeon.Models.Commands;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.IO;
+using System.Threading.Tasks;
+using Windows.Storage;
 using Action = Exeon.Models.Actions.Action;
 
 namespace Exeon.Models
 {
     public class ApplicationContext : DbContext
     {
+        private static string? _databasePath;
+
         public ApplicationContext()
         {
             Database.EnsureCreated();
+        }
+
+        public static async Task InitializeDatabasePathAsync()
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            StorageFile dbFile = await localFolder.CreateFileAsync("Application.db", CreationCollisionOption.OpenIfExists);
+            _databasePath = dbFile.Path;
         }
 
         public DbSet<CustomCommand> CustomCommands { get; set; } = null!;
@@ -25,13 +35,10 @@ namespace Exeon.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var dbFolder = Path.Combine(appDataFolder, "Exeon");
-            if (!Directory.Exists(dbFolder))
-                Directory.CreateDirectory(dbFolder);
+            if (_databasePath == null)
+                throw new InvalidOperationException("Database path not initialized. Call InitializeDatabasePathAsync first.");
 
-            var dbPath = Path.Combine(dbFolder, "Application.db");
-            optionsBuilder.UseSqlite($"Data Source={dbPath}");
+            optionsBuilder.UseSqlite($"Data Source={_databasePath}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

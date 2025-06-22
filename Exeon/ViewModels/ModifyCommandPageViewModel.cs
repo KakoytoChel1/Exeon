@@ -393,13 +393,27 @@ namespace Exeon.ViewModels
         #region Methods
 
         // Проверка на, существует ли переданная триггер строка в БД
-        public bool IsAlreadyExist(string triggerCommandText)
+        public bool IsAlreadyExistModifying(string triggerCommandText)
         {
             bool existInDB = AppState.ApplicationContext.TriggerCommands.Any(
                 tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());
 
             bool existInTemp = AppState.SelectedModifyingCustomCommand!.TriggerCommands.Any(
                 tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());
+
+            bool existInOrigin = AppState.OriginalCommandState!.TriggerCommands.Any(
+                tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());
+
+            // Проверка случая, когда во время редактирования мы удалили тригер
+            // в базе данных он по преждему есть, в бэкапе(origin) тоже, но в экземпляре команды нет
+            // в таком случаи говорим что его не существует и позволяем обновить сущность.
+            if (existInDB && existInOrigin)
+            {
+                if (!existInTemp)
+                {
+                    return false;
+                }
+            }
 
             return existInDB || existInTemp;
         }

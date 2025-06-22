@@ -265,7 +265,7 @@ namespace Exeon.ViewModels
         }
 
         // Проверка на, существует ли переданная триггер строка в БД
-        public bool IsAlreadyExist(string triggerCommandText)
+        public bool IsAlreadyExistAdding(string triggerCommandText)
         {
             bool existInDB = AppState.ApplicationContext.TriggerCommands.Any(
                 tc => tc.CommandText.ToLower() == triggerCommandText.ToLower());

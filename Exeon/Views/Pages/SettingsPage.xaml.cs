@@ -1,8 +1,12 @@
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Exeon.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Navigation;
 using Exeon.Services.IServices;
+using Windows.Storage;
+using System.IO;
+using System;
+using System.Diagnostics;
 
 namespace Exeon.Views.Pages
 {
@@ -28,6 +32,45 @@ namespace Exeon.Views.Pages
                 .Get<bool>("IsApproximateModeOn"))
             {
                 ViewModel.UnsavedChangesExist = true;
+            }
+        }
+
+        private void openLocalFolderBtn_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            var path = localFolder.Path;
+
+            OpenFolderInExplorer(path);
+        }
+
+        public async void OpenFolderInExplorer(string folderPath)
+        {
+            try
+            {
+                if (Directory.Exists(folderPath))
+                {
+                    Process.Start("explorer.exe", folderPath);
+                }
+                else
+                {
+                    var dialog = new ContentDialog
+                    {
+                        Title = "Error",
+                        Content = $"Folder wasn't found. The path: {folderPath}",
+                        CloseButtonText = "ОК"
+                    };
+                    await dialog.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                var dialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"An error occurred while trying to access the following path: {ex.Message}",
+                    CloseButtonText = "ОК"
+                };
+                await dialog.ShowAsync();
             }
         }
     }

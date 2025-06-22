@@ -148,5 +148,21 @@
                 <FontIcon Glyph="&#xE777;" />
             </Viewbox>
         </Button>
+
+        <Button
+            Grid.Row="2"
+            x:Name="openLocalFolderBtn"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0,0,120,20"
+            Height="40"
+            Width="40"
+            Click="openLocalFolderBtn_Click"
+            ToolTipService.ToolTip="Open local folder (Packaged)">
+
+            <Viewbox>
+                <FontIcon Glyph="&#xE838;" />
+            </Viewbox>
+        </Button>
     </Grid>
 </Page>
